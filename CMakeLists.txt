@@ -35,16 +35,16 @@ message(STATUS "Boost version: ${Boost_VERSION}")
 include_directories(include)
 
 # Update name and srcs
-add_library(server src/server.cc)
-add_library(session src/session.cc)
-add_library(config_parser src/config_parser.cc)
+add_library(server_lib src/server.cc)
+add_library(session_lib src/session.cc)
+add_library(config_parser_lib src/config_parser.cc)
 
-add_executable(server_main src/server_main.cc)
-target_link_libraries(server_main Boost::system server session)
+add_executable(server src/server_main.cc)
+target_link_libraries(server Boost::system server_lib session_lib)
 
 # config parser test
 add_executable(config_parser_test tests/config_parser_test.cc)
-target_link_libraries(config_parser_test config_parser gtest_main)
+target_link_libraries(config_parser_test config_parser_lib gtest_main)
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 
