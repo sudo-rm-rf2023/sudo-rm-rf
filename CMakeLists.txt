@@ -35,18 +35,19 @@ message(STATUS "Boost version: ${Boost_VERSION}")
 include_directories(include)
 
 #TODO(!): Update name and srcs
-#add_library(example_lib src/example_lib.cc)
+add_library(config_parser src/config_parser.cc)
 
 add_executable(server_main src/server_main.cc)
 target_link_libraries(server_main Boost::system)
 
-# TODO(!): Update test executable name, srcs, and deps
-# add_executable(example_lib_test tests/example_lib_test.cc)
-# target_link_libraries(example_lib_test example_lib gtest_main)
+# config parser test
+add_executable(config_parser_test tests/config_parser_test.cc)
+target_link_libraries(config_parser_test config_parser gtest_main)
+gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # TODO(!): Update with test binary
 # gtest_discover_tests(example_lib_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # TODO(!): Update with target/test targets
-# include(cmake/CodeCoverageReportConfig.cmake)
-# generate_coverage_report(TARGETS example_server example_lib TESTS example_lib_test)
+include(cmake/CodeCoverageReportConfig.cmake)
+generate_coverage_report(TARGETS config_parser TESTS config_parser_test)
