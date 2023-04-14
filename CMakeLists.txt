@@ -37,8 +37,8 @@ include_directories(include)
 #TODO(!): Update name and srcs
 add_library(config_parser src/config_parser.cc)
 
-add_executable(server_main src/server_main.cc)
-target_link_libraries(server_main Boost::system)
+add_executable(server src/server_main.cc)
+target_link_libraries(server Boost::system)
 
 # config parser test
 add_executable(config_parser_test tests/config_parser_test.cc)
@@ -49,5 +49,5 @@ gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE
 # gtest_discover_tests(example_lib_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # TODO(!): Update with target/test targets
-include(cmake/CodeCoverageReportConfig.cmake)
-generate_coverage_report(TARGETS config_parser TESTS config_parser_test)
+# include(cmake/CodeCoverageReportConfig.cmake)
+# generate_coverage_report(TARGETS config_parser TESTS config_parser_test)
