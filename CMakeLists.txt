@@ -38,6 +38,8 @@ include_directories(include)
 add_library(server_lib src/server.cc)
 add_library(session_lib src/session.cc)
 add_library(config_parser_lib src/config_parser.cc)
+add_library(config_manager_lib src/config_manager.cc)
+target_link_libraries(config_manager_lib config_parser_lib)
 
 add_executable(server src/server_main.cc)
 target_link_libraries(server Boost::system server_lib session_lib)
@@ -47,6 +49,10 @@ add_executable(config_parser_test tests/config_parser_test.cc)
 target_link_libraries(config_parser_test config_parser_lib gtest_main)
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# config manager test
+add_executable(config_manager_test tests/config_manager_test.cc)
+target_link_libraries(config_manager_test config_manager_lib gtest_main)
+gtest_discover_tests(config_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # TODO(!): Update with target/test targets
 # include(cmake/CodeCoverageReportConfig.cmake)
