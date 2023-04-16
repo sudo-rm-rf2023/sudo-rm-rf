@@ -10,15 +10,14 @@ int main(int argc, char* argv[]) {
   {
     if (argc != 2)
     {
-      std::cerr << "Usage: async_tcp_echo_server <port>\n";
+      std::cerr << "Usage: async_tcp_echo_server <config_file>\n";
       return 1;
     }
 
     boost::asio::io_service io_service;
 
     using namespace std; // For atoi.
-    server s(io_service, atoi(argv[1]));
-
+    server s(io_service, argv[1]);
     io_service.run();
   }
   catch (std::exception& e)
