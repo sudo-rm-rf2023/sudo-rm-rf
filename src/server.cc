@@ -44,11 +44,12 @@ void server::handle_accept(session* new_session,
       const boost::system::error_code& error) {
     if (!error)
     {
-      printf("New Connection.");
+      printf("New Connection.\n");
       new_session->start();
     }
     else
     {
+      printf("Accept failed.\n");
       delete new_session;
     }
 
