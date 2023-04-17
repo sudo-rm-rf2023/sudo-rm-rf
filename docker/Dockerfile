@@ -16,16 +16,17 @@ RUN ctest --output-on_failure
 # Define deploy stage
 FROM ubuntu:jammy as deploy
 
-# TODO(!): Copy server output binary to "."
+# Copy server output binary to "."
 COPY --from=builder /usr/src/projects/sudo-rm-rf/build/bin/server .
+COPY --from=builder /usr/src/projects/sudo-rm-rf/server_config .
 
-# TODO(!): Expose some port(s)
+# Expose some port(s)
 EXPOSE 8080
 
 # Use ENTRYPOINT to specify the binary name
-# TODO(!): Update with real server name
+# Update with real server name
 ENTRYPOINT ["./server"]
 
 # Use CMD to specify arguments to ENTRYPOINT
-# TODO(!): Update with real server args
-CMD ["8080"]
+# Update with real server args
+CMD ["server_config"]
