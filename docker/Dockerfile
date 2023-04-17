@@ -21,7 +21,7 @@ COPY --from=builder /usr/src/projects/sudo-rm-rf/build/bin/server .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_config .
 
 # Expose some port(s)
-EXPOSE 8080
+EXPOSE 80
 
 # Use ENTRYPOINT to specify the binary name
 # Update with real server name
