@@ -72,7 +72,10 @@ void session::read_header(){
     int pos;
     if ((pos = received_.find("\r\n\r\n", 0)) != std::string::npos) { 
       return pos;
-    } else { 
+    } 
+    else if ((pos = received_.find("\n\n", 0)) != std::string::npos) { 
+      return pos;
+    }else { 
       return -1;
     }
   };
