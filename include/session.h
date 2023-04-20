@@ -10,6 +10,9 @@
 #include <boost/asio.hpp>
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/string_body.hpp>
+#include <boost/beast/core/flat_buffer.hpp>
+
+#include "echo_request_handler.h"
 
 using boost::asio::ip::tcp;
 
@@ -25,24 +28,18 @@ public:
 
 
 private:
-  void read_header();
-  void read_body(uint32_t byte);
-  void generate_response();
-  void write_response();
+  void read_request();
+  void write_response(const std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>>& response);
   void reset();
 
   tcp::socket socket_;
-  enum { max_length = 1024 };
-  char data_[max_length];
-  std::string received_;
 
-  // TODO: Change these to http::request and http::response
-  std::string request_header_; // content of request header in format of string
-  std::string request_body_;
 
-  boost::beast::http::response<boost::beast::http::string_body> response_;
+  // TODO (qianli): Change this for Dependency Injection
+  EchoRequestHandler request_handler_;
 
-  boost::beast::http::status status_ = boost::beast::http::status::ok;
+  boost::beast::flat_buffer buffer_;
+
 };
 
 #endif

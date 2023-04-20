@@ -39,11 +39,12 @@ add_library(server_lib src/server.cc)
 add_library(session_lib src/session.cc)
 add_library(config_parser_lib src/config_parser.cc)
 add_library(config_manager_lib src/config_manager.cc)
+add_library(request_handler_lib src/echo_request_handler.cc)
 target_link_libraries(config_manager_lib config_parser_lib)
 target_link_libraries(server_lib config_manager_lib)
 
 add_executable(server src/server_main.cc)
-target_link_libraries(server Boost::system server_lib session_lib)
+target_link_libraries(server Boost::system server_lib session_lib request_handler_lib)
 
 # config parser test
 add_executable(config_parser_test tests/config_parser_test.cc)
