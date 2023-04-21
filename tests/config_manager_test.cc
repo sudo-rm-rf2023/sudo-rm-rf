@@ -8,40 +8,30 @@ class ConfigManagerTest : public ::testing::Test {
     protected:
         ConfigManagerTest(){}
         ~ConfigManagerTest(){
-            if(config_file.is_open()){
-                config_file.close();
-            }
+            delete manager;
         }
 
-        std::ifstream config_file;
+        ConfigManager *manager;
 };
 
 TEST_F(ConfigManagerTest, ReadPortNumber){
-    config_file.open("example_config");
-
-    ConfigManager manager(dynamic_cast<std::istream*>(&config_file));
-    EXPECT_EQ(manager.port(), 80);
-    EXPECT_TRUE(manager.isValid());
+    manager = ConfigManager::makeConfigManager("example_config");
+    ASSERT_NE(manager, nullptr);
+    EXPECT_EQ(manager->port(), 80);
 }
 
 TEST_F(ConfigManagerTest, ReadPortNumberFalse){
-    config_file.open("empty_config");
-
-    ConfigManager manager(dynamic_cast<std::istream*>(&config_file));
-    EXPECT_FALSE(manager.isValid());
+    manager = ConfigManager::makeConfigManager("empty_config");
+    EXPECT_EQ(manager, nullptr);
 }
 
 TEST_F(ConfigManagerTest, InvalidListen1){
-    config_file.open("invalid_listen_config1");
-
-    ConfigManager manager(dynamic_cast<std::istream*>(&config_file));
-    EXPECT_FALSE(manager.isValid());
+    manager = ConfigManager::makeConfigManager("invalid_listen_config1");
+    EXPECT_EQ(manager, nullptr);
 }
 
 TEST_F(ConfigManagerTest, InvalidListen2){
-    config_file.open("invalid_listen_config2");
-
-    ConfigManager manager(dynamic_cast<std::istream*>(&config_file));
-    EXPECT_FALSE(manager.isValid());
+    manager = ConfigManager::makeConfigManager("invalid_listen_config2");
+    EXPECT_EQ(manager, nullptr);
 }
 // TODO(yiyangzhou123): more test cases

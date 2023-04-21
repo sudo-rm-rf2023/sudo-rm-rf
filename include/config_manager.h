@@ -5,12 +5,10 @@
 #include "config_parser.h"
 class ConfigManager {
 public:
-    ConfigManager(std::istream* config_stream);
-    bool isValid(){return is_valid_config_;}
+    static ConfigManager* makeConfigManager(const char* config_file);
     short port(){return port_number_;}
 private:
-    void ReadConfig(); //Read the config and store important information in memory.
-    bool is_valid_config_ = true;
+    bool ReadConfig(); //Read the config and store important information in memory.
     short port_number_;
     NginxConfig config_;
 };
