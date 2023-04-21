@@ -4,6 +4,31 @@
 #include <boost/beast/http/verb.hpp>
 #include <sstream>
 
+#include <boost/beast.hpp>
+#include <sstream>
+#include <string>
+
+std::string request_to_string(const boost::beast::http::request<boost::beast::http::string_body> &request) {
+    // Create a std::ostringstream to store the header
+    std::ostringstream header_stream;
+
+    // Write the header to the stream
+    header_stream << request.method_string() << " " << request.target() << " HTTP/" << request.version() << "\r\n";
+    for (const auto &field : request) {
+        header_stream << field.name_string() << ": " << field.value() << "\r\n";
+    }
+    header_stream << "\r\n";
+
+    // Get the header as a string
+    std::string header_str = header_stream.str();
+
+    // Concatenate the header and body, and store in a std::string object
+    std::string full_request_str = header_str + request.body();
+
+    return full_request_str;
+}
+
+
 
 int EchoRequestHandler::handle_request(
     const boost::beast::http::request<boost::beast::http::string_body>& request, 
@@ -12,42 +37,9 @@ int EchoRequestHandler::handle_request(
     response.version(request.version());
     response.result(boost::beast::http::status::ok);
 
-    // TODO: delete this
-    response.body() = request.body();
+    response.body() = request_to_string(request);
     response.set(boost::beast::http::field::content_type, "text/html");
     response.prepare_payload(); // set content-length
+    printf("Response Generated.\n");
     return 1;
-
-    // TODO (qianli): uncomment this
-
-    // switch (status)
-    // {
-    // case boost::beast::http::status::ok:
-    //     // 200 Response
-    //     // Get the request method, target, and version as a string
-    //     boost::beast::http::verb request_verb = request.method();
-    //     std::string method_str = std::string(boost::beast::http::to_string(request_verb));
-    //     std::string request_line = method_str + " " + request.target().to_string() + " HTTP/" + std::to_string(request.version() / 10) + "." + std::to_string(request.version() % 10);
-
-    //     // Iterate through the fields in the request header and construct the header string
-    //     std::string header_str = request_line + "\r\n";
-    //     for (const auto& field : request.base()) {
-    //         header_str += field.name_string().to_string() + ": " + field.value().to_string() + "\r\n";
-    //     }
-    //     header_str += "\r\n";
-    //     response.body() = header_str + request.body();
-    //     response.set(boost::beast::http::field::content_type, "text/html");
-    //     break;
-    // case boost::beast::http::status::bad_request:
-    //     response.body() = "Invalid Request.\n";
-    //     response.set(boost::beast::http::field::content_type, "text/html");
-    //     break;
-    
-    // default:
-    //     fprintf(stderr,"Unknown Error in generate_response.");
-    //     break;
-    // }
-    // response.prepare_payload(); // set content-length
-    // printf("Response Generated.\n");
-    // return response;
 }

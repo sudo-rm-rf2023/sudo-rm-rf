@@ -38,7 +38,7 @@ void session::read_request() {
           write_response(response);
         }
       }else{
-        fprintf(stderr, "Error in async_read: %s\n", ec.message().c_str());
+        fprintf(stderr, "Error in async_read (Bad Request or I/O): %s\n", ec.message().c_str());
         delete this;
         return;
       }
