@@ -16,7 +16,7 @@ using boost::asio::ip::tcp;
 
 class server {
 public:
-  server(boost::asio::io_service& io_service, const char* config_file);
+  server(boost::asio::io_service& io_service, ConfigManager* config_manager);
   server(boost::asio::io_service& io_service, short port) // Deprecate this
     : io_service_(io_service),
       acceptor_(io_service, tcp::endpoint(tcp::v4(), port)){
