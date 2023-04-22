@@ -1,0 +1,5 @@
+server {
+  listen   80;
+  server_name "f\\o\\o.com";
+  root /home/ubuntu/sites/foo/;
+}
