@@ -5,6 +5,7 @@ FROM ubuntu:jammy as base
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Update the base image and install build environment
+# gcovr is used to generate coverage reports
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -15,4 +16,5 @@ RUN apt-get update && apt-get install -y \
     libboost-system-dev \
     libgmock-dev \
     libgtest-dev \
-    netcat
+    netcat \
+    gcovr
