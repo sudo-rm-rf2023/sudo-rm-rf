@@ -12,9 +12,13 @@ std::string request_to_string(const boost::beast::http::request<boost::beast::ht
     // Create a std::ostringstream to store the header
     std::ostringstream header_stream;
 
+    // Calculate major and minor version numbers
+    int major_version = request.version() / 10;
+    int minor_version = request.version() % 10;
+
     // Write the header to the stream
-    header_stream << request.method_string() << " " << request.target() << " HTTP/" << request.version() << "\r\n";
-    for (const auto &field : request) {
+    header_stream << request.method_string() << " " << request.target() << " HTTP/" << major_version << "." << minor_version << "\r\n";
+    for (const auto& field : request) {
         header_stream << field.name_string() << ": " << field.value() << "\r\n";
     }
     header_stream << "\r\n";

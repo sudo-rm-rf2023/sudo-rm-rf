@@ -9,5 +9,6 @@ The report is in `build_coverage/report/index.html`
 
 # Run integration test script
 ```
-$ ./tests/integration.sh 
+$ cd tests
+$ ./integration.sh 
 ```

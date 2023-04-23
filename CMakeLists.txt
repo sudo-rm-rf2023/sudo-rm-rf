@@ -62,6 +62,9 @@ add_executable(server_test tests/server_test.cc)
 target_link_libraries(server_test server_lib gtest_main)
 gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# integration test
+add_test(NAME integration_test COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/tests/integration.sh)
+
 # TODO(!): Update with target/test targets
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(

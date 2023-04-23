@@ -3,4 +3,4 @@
 build
 build_*
 mirror
-tests/actual_response.txt
+tests/actual*.txt

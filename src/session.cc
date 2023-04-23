@@ -38,7 +38,18 @@ void session::read_request() {
           write_response(response);
         }
       }else{
-        fprintf(stderr, "Error in async_read (Bad Request or I/O): %s\n", ec.message().c_str());
+        // Check if the error is caused by a bad request
+        if (ec == boost::beast::http::error::bad_target) {
+          fprintf(stderr, "Bad Request: %s\n", ec.message().c_str());
+          // Send a 400 Bad Request response
+          std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>> response = std::make_shared<boost::beast::http::response<boost::beast::http::string_body>>(boost::beast::http::status::bad_request, 11);
+          response->set(boost::beast::http::field::content_type, "text/plain");
+          response->body() = "Invalid request.";
+          response->prepare_payload();
+          write_response(response);
+        } else {
+          fprintf(stderr, "Error in async_read (I/O): %s\n", ec.message().c_str());
+        }
         delete this;
         return;
       }
@@ -47,7 +58,7 @@ void session::read_request() {
 
 void session::reset() {
   printf("Session reseted.\n");
-  read_request();
+  // read_request();
 }
 
 // Write response to socket
