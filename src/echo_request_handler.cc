@@ -42,7 +42,7 @@ int EchoRequestHandler::handle_request(
     response.result(boost::beast::http::status::ok);
 
     response.body() = request_to_string(request);
-    response.set(boost::beast::http::field::content_type, "text/html");
+    response.set(boost::beast::http::field::content_type, "text/plain");
     response.prepare_payload(); // set content-length
     printf("Response Generated.\n");
     return 1;

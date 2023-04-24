@@ -22,10 +22,16 @@ public:
   ~session(){
     printf("Session deleted.\n");
   }
-  session(boost::asio::io_service& io_service) :socket_(io_service) {};
+  session(boost::asio::io_service& io_service, RequestHandler* request_handler) :socket_(io_service), request_handler_(request_handler) {
+    printf("Session created.\n");
+  }
+
+  static session* makeSession(boost::asio::io_service& io_service, RequestHandler* request_handler){
+    return new session(io_service, request_handler);
+  }
+
   tcp::socket& socket();
   void start();
-
 
 private:
   void read_request();
@@ -36,7 +42,7 @@ private:
 
 
   // TODO (qianli): Change this for Dependency Injection
-  EchoRequestHandler request_handler_;
+  std::unique_ptr<RequestHandler> request_handler_;
 
   boost::beast::flat_buffer buffer_;
 

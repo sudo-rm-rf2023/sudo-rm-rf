@@ -74,7 +74,7 @@ gtest_discover_tests(echo_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
-        server_lib session_lib config_manager_lib config_parser_lib request_handler_lib
+        server server_lib session_lib config_manager_lib config_parser_lib request_handler_lib
     TESTS 
         config_parser_test config_manager_test server_test echo_request_handler_test)
 

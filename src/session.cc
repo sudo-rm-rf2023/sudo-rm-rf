@@ -28,7 +28,7 @@ void session::read_request() {
         printf("Read %ld bytes. Body: %ld Bytes.\n", bytes_transferred, request->body().size());
         // Create a shared pointer to the response object (lifetime managed by the session)
         std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>> response = std::make_shared<boost::beast::http::response<boost::beast::http::string_body>>();
-        if(request_handler_.handle_request(*request, *response)){
+        if(request_handler_->handle_request(*request, *response)){
           printf("Response Generated.\n");
           write_response(response);
         } else {
@@ -42,10 +42,8 @@ void session::read_request() {
         if (ec == boost::beast::http::error::bad_target) {
           fprintf(stderr, "Bad Request: %s\n", ec.message().c_str());
           // Send a 400 Bad Request response
-          std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>> response = std::make_shared<boost::beast::http::response<boost::beast::http::string_body>>(boost::beast::http::status::bad_request, 11);
-          response->set(boost::beast::http::field::content_type, "text/plain");
-          response->body() = "Invalid request.";
-          response->prepare_payload();
+          std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>> response = std::make_shared<boost::beast::http::response<boost::beast::http::string_body>>();
+          request_handler_->handle_bad_request(*response);
           write_response(response);
         } else {
           fprintf(stderr, "Error in async_read (I/O): %s\n", ec.message().c_str());

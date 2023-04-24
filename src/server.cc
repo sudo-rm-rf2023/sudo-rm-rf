@@ -22,7 +22,8 @@ server::server(boost::asio::io_service &io_service, ConfigManager *config_manage
 }
 
 void server::start_accept() {
-    session *new_session = new session(io_service_);
+    RequestHandler* echo_request_handler = new EchoRequestHandler();
+    session *new_session = session::makeSession(io_service_, echo_request_handler);
     acceptor_.async_accept(new_session->socket(),
                            boost::bind(&server::handle_accept, this, new_session,
                                        boost::asio::placeholders::error));

@@ -8,9 +8,19 @@ EXPECTED_RESPONSE_FILE="expected_response.txt"
 EXPECTED_INVALID_RESPONSE_FILE="expected_invalid_response.txt"
 ACTUAL_RESPONSE_FILE="actual_response.txt"
 ACTUAL_INVALID_RESPONSE_FILE="actual_invalid_response.txt"
-COMMAND_NAME="${SCRIPT_DIR}/../build/bin/server"
+
+# Check for the existence of the executable in both locations
+if [ -f "${SCRIPT_DIR}/../build/bin/server" ]; then
+  COMMAND_NAME="${SCRIPT_DIR}/../build/bin/server"
+elif [ -f "${SCRIPT_DIR}/../build_coverage/bin/server" ]; then
+  COMMAND_NAME="${SCRIPT_DIR}/../build_coverage/bin/server"
+else
+  echo "Server executable not found in both build and build_coverage directories."
+  exit 1
+fi
 
 echo $COMMAND_NAME
+
 # Run the web server binary with the test config file in the background
 # Assume script is in the tests directory
 $COMMAND_NAME "${SCRIPT_DIR}/$TEST_CONFIG" &
