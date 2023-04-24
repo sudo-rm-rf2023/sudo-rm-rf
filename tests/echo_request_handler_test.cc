@@ -39,3 +39,10 @@ TEST_F(EchoRequestHandlerTest, FakeDelimiter){
     ASSERT_EQ(handler_.handle_request(request_, response_), 1);
     EXPECT_TRUE(response_.body().find(test_str) != std::string::npos);
 }
+
+TEST_F(EchoRequestHandlerTest, BadRequest){
+    ASSERT_EQ(handler_.handle_bad_request(response_), 1);
+    EXPECT_EQ(response_.result_int(), 400);
+    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
+    EXPECT_TRUE(response_.body() == "Invalid Request");
+}
