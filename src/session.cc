@@ -19,10 +19,10 @@ void session::start() {
 
 // read request by http::async_read
 void session::read_request() {
-  
+
   std::shared_ptr<boost::beast::http::request<boost::beast::http::string_body>> request = std::make_shared<boost::beast::http::request<boost::beast::http::string_body>>();
 
-  boost::beast::http::async_read(socket_, buffer_, *request, 
+  boost::beast::http::async_read(socket_, buffer_, *request,
     [this, request](boost::beast::error_code ec, std::size_t bytes_transferred){
       if(!ec){
         printf("Read %ld bytes. Body: %ld Bytes.\n", bytes_transferred, request->body().size());
@@ -62,7 +62,7 @@ void session::reset() {
 // Write response to socket
 void session::write_response(const std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>>& response){
   // printf("Body: %ld Bytes.\n", response->body().size());
-  boost::beast::http::async_write(socket_, *response, 
+  boost::beast::http::async_write(socket_, *response,
     // wrap response in a lambda function to keep it alive
     [this, response](boost::beast::error_code ec, std::size_t byte_transferred){
       printf("Write %ld bytes. Body: %ld Bytes.\n", byte_transferred, response->body().size());

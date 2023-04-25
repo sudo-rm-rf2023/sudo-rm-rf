@@ -70,11 +70,16 @@ add_executable(echo_request_handler_test tests/echo_request_handler_test.cc)
 target_link_libraries(echo_request_handler_test request_handler_lib gtest_main)
 gtest_discover_tests(echo_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# session test
+add_executable(session_test tests/session_test.cc)
+target_link_libraries(session_test session_lib gtest_main)
+gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
 # TODO(!): Update with target/test targets
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
         server server_lib session_lib config_manager_lib config_parser_lib request_handler_lib
     TESTS 
-        config_parser_test config_manager_test server_test echo_request_handler_test)
+        config_parser_test config_manager_test server_test session_test echo_request_handler_test)
 
