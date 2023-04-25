@@ -1,5 +1,3 @@
-
-
 #include "echo_request_handler.h"
 #include <boost/beast/http/verb.hpp>
 #include <sstream>
@@ -17,7 +15,14 @@ std::string request_to_string(const boost::beast::http::request<boost::beast::ht
     int minor_version = request.version() % 10;
 
     // Write the header to the stream
-    header_stream << request.method_string() << " " << request.target() << " HTTP/" << major_version << "." << minor_version << "\r\n";
+    header_stream << request.method_string();
+    header_stream << " ";
+    header_stream << request.target();
+    header_stream << " HTTP/";
+    header_stream << major_version;
+    header_stream << ".";
+    header_stream << minor_version;
+    header_stream << "\r\n";
     for (const auto& field : request) {
         header_stream << field.name_string() << ": " << field.value() << "\r\n";
     }
@@ -45,5 +50,13 @@ int EchoRequestHandler::handle_request(
     response.set(boost::beast::http::field::content_type, "text/plain");
     response.prepare_payload(); // set content-length
     printf("Response Generated.\n");
+    return 1;
+}
+
+int EchoRequestHandler::handle_bad_request(boost::beast::http::response<boost::beast::http::string_body>& response) {
+    response.result(boost::beast::http::status::bad_request);
+    response.set(boost::beast::http::field::content_type, "text/plain");
+    response.body() = "Invalid Request";
+    response.prepare_payload();
     return 1;
 }
