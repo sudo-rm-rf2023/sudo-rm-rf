@@ -19,6 +19,9 @@ TEST_F(serverTest, ConstructServer) {
     config_manager = ConfigManager::makeConfigManager("server_test_config");
     test_server = new server(io_service, config_manager);
     using namespace std::chrono_literals;
+    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address_v4::loopback(), config_manager->port());
+    boost::asio::ip::tcp::socket socket(io_service);
+    socket.connect(endpoint);
     io_service.run_for(1s);
     exit(0);
 }
