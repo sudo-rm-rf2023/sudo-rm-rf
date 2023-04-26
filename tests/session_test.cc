@@ -6,7 +6,6 @@ protected:
     sessionTest() {}
     ~sessionTest() {
         delete test_session;
-        delete echo_request_handler;
     }
     boost::asio::io_service io_service;
     session *test_session;
@@ -17,6 +16,6 @@ TEST_F(sessionTest, StartSession) {
     echo_request_handler = new EchoRequestHandler();
     test_session = session::makeSession(io_service, echo_request_handler);
     test_session->start();
-    exit(0);
+    return;
 }
 // todo(yunqiu21): add tests for different cases

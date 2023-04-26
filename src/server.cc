@@ -22,21 +22,20 @@ server::server(boost::asio::io_service &io_service, ConfigManager *config_manage
 }
 
 void server::start_accept() {
-    RequestHandler* echo_request_handler = new EchoRequestHandler();
-    session *new_session = session::makeSession(io_service_, echo_request_handler);
+    RequestHandler *echo_request_handler = new EchoRequestHandler();
+    std::shared_ptr<session> new_session = std::shared_ptr<session>(session::makeSession(io_service_, echo_request_handler));
     acceptor_.async_accept(new_session->socket(),
                            boost::bind(&server::handle_accept, this, new_session,
                                        boost::asio::placeholders::error));
 }
 
-void server::handle_accept(session *new_session,
+void server::handle_accept(std::shared_ptr<session> new_session,
                            const boost::system::error_code &error) {
     if (!error) {
         printf("New Connection.\n");
         new_session->start();
     } else {
         printf("Accept failed.\n");
-        delete new_session;
     }
 
     start_accept();

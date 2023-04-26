@@ -25,7 +25,7 @@ public:
 private:
   void start_accept();
 
-  void handle_accept(session* new_session,
+  void handle_accept(std::shared_ptr<session> new_session,
       const boost::system::error_code& error);
 
   boost::asio::io_service& io_service_;
