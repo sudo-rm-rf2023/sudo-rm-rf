@@ -7,6 +7,7 @@ class serverTest : public ::testing::Test {
 protected:
     serverTest() {}
     ~serverTest() {
+        delete config_manager;
         delete test_server;
     }
     boost::asio::io_service io_service;
@@ -22,6 +23,6 @@ TEST_F(serverTest, ConstructServer) {
     boost::asio::ip::tcp::socket socket(io_service);
     socket.connect(endpoint);
     io_service.run_for(1s);
-    return;
+    exit(0);
 }
 // todo(yunqiu21): add tests for different cases
