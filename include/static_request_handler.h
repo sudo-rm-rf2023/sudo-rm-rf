@@ -12,6 +12,7 @@ class StaticRequestHandler : public RequestHandler {
         const boost::beast::http::request<boost::beast::http::string_body>& request,
         boost::beast::http::response<boost::beast::http::string_body>& response) override;
 
+        virtual HandlerType type() override;
     private:
         std::string mime_type(const std::string& path);
         std::string base_dir_;

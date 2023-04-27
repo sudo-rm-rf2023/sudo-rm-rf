@@ -2,11 +2,12 @@
 #define REQUEST_HANDLER_H
 
 #include <cstdlib>
+#include <string>
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/string_body.hpp>
 #include <boost/beast/http/status.hpp>
 
-
+#include "utils.h"
 
 class RequestHandler {
     public:
@@ -21,7 +22,8 @@ class RequestHandler {
             response.prepare_payload();
             return 1;
         }
-};
 
+        virtual HandlerType type()=0;
+};
 
 #endif

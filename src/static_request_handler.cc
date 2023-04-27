@@ -82,3 +82,7 @@ int StaticRequestHandler::handle_request(
 
     return 0; // Return 0 to indicate success
     }
+
+HandlerType StaticRequestHandler::type() {
+    return STATIC_HANDLER;
+}

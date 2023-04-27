@@ -52,3 +52,7 @@ int EchoRequestHandler::handle_request(
     printf("Response Generated.\n");
     return 1;
 }
+
+HandlerType EchoRequestHandler::type() {
+    return ECHO_HANDLER;
+}
