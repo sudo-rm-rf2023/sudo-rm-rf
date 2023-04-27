@@ -10,5 +10,5 @@ The report is in `build_coverage/report/index.html`
 # Run integration test script
 ```
 $ cd tests
-$ ./integration.sh 
+$ ./integration.sh -c
 ```

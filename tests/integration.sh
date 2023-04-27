@@ -1,13 +1,37 @@
 #!/bin/bash
 
+# COLOR
+USE_COLOR=false
+
+for arg in "$@"
+do
+  if [ "$arg" = "-c" ]; then
+    USE_COLOR=true
+    shift  # Remove the "color" argument from the list
+  fi
+done
+
+RED="31"
+GREEN="32"
+YELLOW="33"
+BLUE="34"
+BOLDRED=$([ "$USE_COLOR" = "true" ] && echo "\e[1;${RED}m" || echo "")
+BOLDGREEN=$([ "$USE_COLOR" = "true" ] && echo "\e[1;${GREEN}m" || echo "")
+BOLDYELLOW=$([ "$USE_COLOR" = "true" ] && echo "\e[1;${YELLOW}m" || echo "")
+BOLDBLUE=$([ "$USE_COLOR" = "true" ] && echo "\e[1;${BLUE}m" || echo "")
+ITALICRED=$([ "$USE_COLOR" = "true" ] && echo "\e[3;${RED}m" || echo "")
+ENDCOLOR=$([ "$USE_COLOR" = "true" ] && echo "\e[0m" || echo "")
+
+
 # Configuration
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"  # Get the directory of this script
 TEST_CONFIG="../server_config"
 TEST_PORT=8080
-EXPECTED_RESPONSE_FILE="expected_response.txt"
-EXPECTED_INVALID_RESPONSE_FILE="expected_invalid_response.txt"
-ACTUAL_RESPONSE_FILE="actual_response.txt"
-ACTUAL_INVALID_RESPONSE_FILE="actual_invalid_response.txt"
+
+# Initialize variables for test results
+TOTAL_TESTS=0
+PASSED_TESTS=0
+FAILED_TESTS=0
 
 # Check for the existence of the executable in both locations
 if [ -f "${SCRIPT_DIR}/../build/bin/server" ]; then
@@ -15,11 +39,12 @@ if [ -f "${SCRIPT_DIR}/../build/bin/server" ]; then
 elif [ -f "${SCRIPT_DIR}/../build_coverage/bin/server" ]; then
   COMMAND_NAME="${SCRIPT_DIR}/../build_coverage/bin/server"
 else
-  echo "Server executable not found in both build and build_coverage directories."
+  echo "${ITALICRED}Server executable not found in both build and build_coverage directories.${ENDCOLOR}"
   exit 1
 fi
 
-echo $COMMAND_NAME
+echo -e "${BOLDBLUE}${COMMAND_NAME}${ENDCOLOR}"
+
 
 # Run the web server binary with the test config file in the background
 # Assume script is in the tests directory
@@ -29,49 +54,42 @@ SERVER_PID=$!
 # Give the server some time to start
 sleep 1
 
-# Send a request to the web server and capture the output
-curl -o "${SCRIPT_DIR}/$ACTUAL_RESPONSE_FILE" -X POST -H "Content-Type: text/plain" -d "This is a test message" -s -S http://localhost:${TEST_PORT}
 
-# Verify that the response from the web server is as expected
-# -b option ignores line endings (Windows vs. Linux)
-diff -b "${SCRIPT_DIR}/$EXPECTED_RESPONSE_FILE" "${SCRIPT_DIR}/$ACTUAL_RESPONSE_FILE"
-DIFF_EXIT_CODE=$?
+# Execute each test script and collect results
+for TEST_SCRIPT in ${SCRIPT_DIR}/integration/*_test.sh; do
+  ((TOTAL_TESTS++))
+  echo -e "${BOLDYELLOW}Running test $TEST_SCRIPT${ENDCOLOR}"
+  RESULT=$(bash "$TEST_SCRIPT" "${SCRIPT_DIR}/integration" $TEST_PORT)
+  # echo -e "${BOLDBLUE}Result: $RESULT${ENDCOLOR}"
+  if [ "$RESULT" == "PASS" ]; then
+    ((PASSED_TESTS++))
+    echo -e "Test ${BOLDGREEN}$(basename $TEST_SCRIPT): PASS${ENDCOLOR}"
+  else
+    ((FAILED_TESTS++))
+    echo -e "Test ${TEST_SCRIPT}: ${ITALICRED}FAIL ${ENDCOLOR}"
+    echo -e "${ITALICRED}${RESULT}${ENDCOLOR}"
+  fi
+done
+
 
 # Shut down the web server
 kill $SERVER_PID
+# Remove the temporary files
+rm -f ${SCRIPT_DIR}/integration/actual_*
 
-# Continue to next test or exit with failure (1)
-if [ $DIFF_EXIT_CODE -eq 0 ]; then
-  echo "Integration test 1: SUCCESS"
+
+# Calculate and print pass rate
+PASS_RATE=$(echo "${PASSED_TESTS} ${TOTAL_TESTS}" | awk '{printf "%.2f", ($1 * 100 / $2)}')
+
+if [ $(echo "$PASS_RATE" | awk '{if ($1 < 100) print 1; else print 0}') -eq 1 ]; then
+  echo -e "${BOLDRED}Passed $PASSED_TESTS out of $TOTAL_TESTS tests ($PASS_RATE%)${ENDCOLOR}"
 else
-  echo "Integration test 1: FAILURE"
-  exit 1
+  echo -e "${BOLDGREEN}Passed $PASSED_TESTS out of $TOTAL_TESTS tests ($PASS_RATE%)${ENDCOLOR}"
 fi
 
-# Run the web server binary with the test config file in the background
-# Assume script is in the tests directory
-$COMMAND_NAME "${SCRIPT_DIR}/$TEST_CONFIG" &
-SERVER_PID=$!
-
-# Give the server some time to start
-sleep 1
-
-# Send a request to the web server and capture the output
-echo -ne "INVALID REQUEST\r\n\r\n" | nc localhost 8080 > "${SCRIPT_DIR}/$ACTUAL_INVALID_RESPONSE_FILE"
-
-# Verify that the response from the web server is as expected
-diff -b "${SCRIPT_DIR}/$EXPECTED_INVALID_RESPONSE_FILE" "${SCRIPT_DIR}/$ACTUAL_INVALID_RESPONSE_FILE"
-DIFF_EXIT_CODE=$?
-
-# Shut down the web server
-kill $SERVER_PID
-
-# Exit with an exit code indicating success (0) or failure (1)
-if [ $DIFF_EXIT_CODE -eq 0 ]; then
-  echo "Integration test 2: SUCCESS"
+if [ $FAILED_TESTS -eq 0 ]; then
   exit 0
 else
-  echo "Integration test 2: FAILURE"
   exit 1
 fi
 
