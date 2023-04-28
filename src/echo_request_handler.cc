@@ -52,11 +52,3 @@ int EchoRequestHandler::handle_request(
     printf("Response Generated.\n");
     return 1;
 }
-
-int EchoRequestHandler::handle_bad_request(boost::beast::http::response<boost::beast::http::string_body>& response) {
-    response.result(boost::beast::http::status::bad_request);
-    response.set(boost::beast::http::field::content_type, "text/plain");
-    response.body() = "Invalid Request";
-    response.prepare_payload();
-    return 1;
-}

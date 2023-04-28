@@ -11,8 +11,6 @@ class EchoRequestHandler : public RequestHandler {
         const boost::beast::http::request<boost::beast::http::string_body>& request,
         boost::beast::http::response<boost::beast::http::string_body>& response) override;
 
-        virtual int handle_bad_request(
-        boost::beast::http::response<boost::beast::http::string_body>& response) override;
 };
 
 #endif

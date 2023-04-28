@@ -13,6 +13,7 @@
 #include <boost/beast/core/flat_buffer.hpp>
 
 #include "echo_request_handler.h"
+#include "static_request_handler.h"
 
 using boost::asio::ip::tcp;
 

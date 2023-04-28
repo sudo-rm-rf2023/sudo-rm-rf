@@ -39,13 +39,14 @@ add_library(server_lib src/server.cc)
 add_library(session_lib src/session.cc)
 add_library(config_parser_lib src/config_parser.cc)
 add_library(config_manager_lib src/config_manager.cc)
-add_library(request_handler_lib src/echo_request_handler.cc)
+add_library(echo_handler_lib src/echo_request_handler.cc)
+add_library(static_handler_lib src/static_request_handler.cc)
 target_link_libraries(config_manager_lib config_parser_lib)
 target_link_libraries(server_lib config_manager_lib session_lib)
-target_link_libraries(session_lib request_handler_lib)
+target_link_libraries(session_lib echo_handler_lib static_handler_lib)
 
 add_executable(server src/server_main.cc)
-target_link_libraries(server Boost::system server_lib session_lib request_handler_lib)
+target_link_libraries(server Boost::system server_lib session_lib echo_handler_lib)
 
 # config parser test
 add_executable(config_parser_test tests/config_parser_test.cc)
@@ -66,9 +67,14 @@ gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/t
 add_test(NAME integration_test COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/tests/integration.sh)
 
 # echo_request_handler test 
-add_executable(request_handler_test tests/request_handler_test.cc)
-target_link_libraries(request_handler_test request_handler_lib gtest_main)
-gtest_discover_tests(request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+add_executable(echo_request_handler_test tests/echo_request_handler_test.cc)
+target_link_libraries(echo_request_handler_test echo_handler_lib gtest_main)
+gtest_discover_tests(echo_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
+# static_handler test
+add_executable(static_request_handler_test tests/static_request_handler_test.cc)
+target_link_libraries(static_request_handler_test static_handler_lib gtest_main)
+gtest_discover_tests(static_request_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # session test
 add_executable(session_test tests/session_test.cc)
@@ -79,7 +85,7 @@ gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
-        server server_lib session_lib config_manager_lib config_parser_lib request_handler_lib
+        server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib static_handler_lib
     TESTS 
-        config_parser_test config_manager_test server_test session_test request_handler_test)
+        config_parser_test config_manager_test server_test session_test echo_request_handler_test static_request_handler_test)
 
