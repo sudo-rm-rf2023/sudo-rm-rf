@@ -1,0 +1,17 @@
+server {
+    listen 9000;
+    location / {
+        baseDir /data;
+        serveType static;
+    }
+    location /echo {
+        serveType echo;
+    }
+    location /webpage {
+        baseDir /data/www;
+        serveType static;
+    }
+}
+
+foo bar;
+Hello World!;

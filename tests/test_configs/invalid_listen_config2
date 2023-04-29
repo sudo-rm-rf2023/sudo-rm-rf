@@ -1,5 +1,5 @@
 server {
   listen abcd ;
   server_name foo.com;
-  root /home/ubuntu/sites/foo/;
+  baseDir /home/ubuntu/sites/foo;
 }
