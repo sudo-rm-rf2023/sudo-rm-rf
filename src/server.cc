@@ -16,8 +16,8 @@ server::server(boost::asio::io_service &io_service, ConfigManager *config_manage
     config_manager_ = std::unique_ptr<ConfigManager>(config_manager);
     acceptor_ = boost::asio::ip::tcp::acceptor(io_service, tcp::endpoint(tcp::v4(), config_manager_->port()));
 
+    SetUpSignalHandlers();
     printf("Port Number:%d\n", config_manager_->port());
-
     start_accept();
 }
 
@@ -40,4 +40,22 @@ void server::handle_accept(session *new_session,
     }
 
     start_accept();
+}
+
+void server::Stop(){
+    acceptor_.close();
+    io_service_.stop();
+    printf("Server stopped.\n");
+}
+
+// Helper function to set up signal handling for Server objects to exit gracefully upon SIGINT and SIGNTERM
+void server::SetUpSignalHandlers(){
+    signals_.async_wait([&](const boost::system::error_code& ec, int signal_number){
+        if (!ec) {
+            printf("Received signal: %d. Exiting Gracefully...\n", signal_number);
+            Stop();
+        } else {
+            printf("Error in signal handler: %s. Signal Number: %d.\n",ec.message().c_str(), signal_number);
+        }
+    });
 }

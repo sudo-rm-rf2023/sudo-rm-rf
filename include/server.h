@@ -23,14 +23,19 @@ public:
     start_accept();
   }
 private:
+  void SetUpSignalHandlers();
   void start_accept();
 
   void handle_accept(session* new_session,
       const boost::system::error_code& error);
 
+  void Stop(); // Gracefully exit
+
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
   std::unique_ptr<ConfigManager> config_manager_;
+
+  boost::asio::signal_set signals_ = boost::asio::signal_set(io_service_, SIGINT, SIGTERM);
 };
 
 #endif
