@@ -29,10 +29,13 @@ add_subdirectory(/usr/src/googletest googletest)
 # Enable Boost
 # Use static libraries so binaries can be deployed without a full boost install
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost 1.50 REQUIRED COMPONENTS system)
+find_package(Boost 1.50 REQUIRED COMPONENTS system log log_setup)
 message(STATUS "Boost version: ${Boost_VERSION}")
 
 include_directories(include)
+
+# Add the new logger source file
+add_library(logger_lib src/logger.cc)
 
 # Update name and srcs
 add_library(server_lib src/server.cc)
@@ -42,10 +45,15 @@ add_library(config_manager_lib src/config_manager.cc)
 add_library(echo_handler_lib src/echo_request_handler.cc)
 add_library(static_handler_lib src/static_request_handler.cc)
 add_library(router_lib src/router.cc)
+
 target_link_libraries(config_manager_lib config_parser_lib)
-target_link_libraries(server_lib config_manager_lib session_lib)
+target_link_libraries(server_lib config_manager_lib session_lib logger_lib)
 target_link_libraries(session_lib echo_handler_lib static_handler_lib)
 target_link_libraries(router_lib echo_handler_lib static_handler_lib)
+
+# Link Boost libraries
+target_link_libraries(logger_lib Boost::log Boost::log_setup Boost::system)
+target_link_libraries(server_lib Boost::log Boost::log_setup)
 
 add_executable(server src/server_main.cc)
 target_link_libraries(server Boost::system server_lib session_lib echo_handler_lib)

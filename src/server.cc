@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include "server.h"
+#include "logger.h"
 
 server::server(boost::asio::io_service &io_service, ConfigManager *config_manager) : io_service_(io_service), acceptor_(io_service) {
 
@@ -17,6 +18,7 @@ server::server(boost::asio::io_service &io_service, ConfigManager *config_manage
     acceptor_ = boost::asio::ip::tcp::acceptor(io_service, tcp::endpoint(tcp::v4(), config_manager_->port()));
 
     SetUpSignalHandlers();
+    BOOST_LOG_TRIVIAL(info) << "Port Number:" << config_manager_->port() << "\n";
     printf("Port Number:%d\n", config_manager_->port());
     start_accept();
 }
@@ -32,9 +34,11 @@ void server::start_accept() {
 void server::handle_accept(session *new_session,
                            const boost::system::error_code &error) {
     if (!error) {
+        BOOST_LOG_TRIVIAL(info) << "New Connection.";
         printf("New Connection.\n");
         new_session->start();
     } else {
+        BOOST_LOG_TRIVIAL(error) << "Accept failed.";
         printf("Accept failed.\n");
         delete new_session;
     }

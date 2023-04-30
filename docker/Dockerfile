@@ -19,6 +19,7 @@ FROM ubuntu:jammy as deploy
 # Copy server output binary to "."
 COPY --from=builder /usr/src/projects/sudo-rm-rf/build/bin/server .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_config .
+COPY --from=builder /usr/src/projects/sudo-rm-rf/static ./static
 
 # Expose some port(s)
 EXPOSE 80
