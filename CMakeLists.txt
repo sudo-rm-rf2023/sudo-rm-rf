@@ -91,11 +91,16 @@ add_executable(session_test tests/session_test.cc)
 target_link_libraries(session_test session_lib gtest_main)
 gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# router test
+add_executable(router_test tests/router_test.cc)
+target_link_libraries(router_test router_lib gtest_main)
+gtest_discover_tests(router_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
 # TODO(!): Update with target/test targets
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
-        server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib static_handler_lib
+        server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib static_handler_lib router_lib
     TESTS 
-        config_parser_test config_manager_test server_test session_test echo_request_handler_test static_request_handler_test)
+        config_parser_test config_manager_test server_test session_test echo_request_handler_test static_request_handler_test router_test)
 

@@ -29,7 +29,7 @@ TEST_F(RequestHandlerTest, HelloWorld){
     ASSERT_EQ(handler_->handle_request(request_, response_), 1);
     for (const auto &field : request_) {
         EXPECT_TRUE(response_.body().find(field.name_string().to_string()) != std::string::npos);
-         EXPECT_TRUE(response_.body().find(field.value().to_string()) != std::string::npos);
+        EXPECT_TRUE(response_.body().find(field.value().to_string()) != std::string::npos);
     }
     EXPECT_EQ(response_.result_int(), 200);
     EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");

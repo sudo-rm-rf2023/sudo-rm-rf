@@ -5,7 +5,7 @@
 
 enum HandlerType {
     ECHO_HANDLER = 1,
-    STATIC_HANDLER = 2
+    STATIC_HANDLER = 2,
 };
 
 struct RouterEntry {
