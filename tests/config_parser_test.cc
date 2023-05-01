@@ -2,6 +2,7 @@
 #include "config_parser.h"
 #include <iostream>
 #include <string>
+#include "gmock/gmock.h"
 
 class NginxConfigParserTest : public ::testing::Test{
   protected:
@@ -62,6 +63,16 @@ TEST_F(NginxConfigParserTest, ConfigWithComment){
 TEST_F(NginxConfigParserTest, ConfigWithSingleQuote){
   EXPECT_TRUE(ParseString("foo \'bar\\\"\'; \n")); // foo 'bar\';
   EXPECT_TRUE(ParseString("foo \'bar\\\'\'; \n")); // foo 'bar\'';
+}
+
+using ::testing::SizeIs;
+using ::testing::ElementsAre;
+using ::testing::ElementsAreArray;
+
+TEST_F(NginxConfigParserTest, ConfigStartingWithComment){
+  EXPECT_TRUE(ParseString("# This is a comment.\nfoo \"bar\"; \n")); // foo "bar";
+  EXPECT_THAT(out_config.statements_, SizeIs(1));
+  EXPECT_THAT(out_config.statements_[0]->tokens_, ElementsAreArray({std::string("foo"), std::string("\"bar\"")}));
 }
 
 // NginxConfigStatement::ToString() correctly prints out the statement
