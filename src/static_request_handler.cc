@@ -4,12 +4,14 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "logger.h"
+
 
 // Constructor
 StaticRequestHandler::StaticRequestHandler(const std::string base_dir)
     : base_dir_(base_dir) {
-    printf("StaticRequestHandler created\n");
-    printf("base_dir: %s\n", base_dir_.c_str());
+    BOOST_LOG_TRIVIAL(info) << "StaticRequestHandler created";
+    BOOST_LOG_TRIVIAL(info) << "base_dir: " << base_dir_;
 }
 
 // Destructor
@@ -55,17 +57,19 @@ int StaticRequestHandler::handle_request(
 
     // Build file path from request target
     std::string file_path = base_dir_ + request.target().to_string();
-    printf("file_path: %s\n", file_path.c_str());
+    BOOST_LOG_TRIVIAL(info) << "StaticRequestHandler::handle_request called";
+    BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();
+    BOOST_LOG_TRIVIAL(info) << "file_path: " << file_path;
 
     // Check if file exists
     std::ifstream file(file_path, std::ios::in | std::ios::binary);
     if (!file) {
-        printf("File not found\n");
+        BOOST_LOG_TRIVIAL(info) << "File not found";
         response.result(boost::beast::http::status::not_found);
         response.set(boost::beast::http::field::content_type, "text/plain");
         response.body() = "File not found";
     } else {
-        printf("File found\n");
+        BOOST_LOG_TRIVIAL(info) << "File found";
         // Read file content into response body
         std::ostringstream content_stream;
         content_stream << file.rdbuf();

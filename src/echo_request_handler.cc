@@ -5,6 +5,7 @@
 #include <boost/beast.hpp>
 #include <sstream>
 #include <string>
+#include "logger.h"
 
 std::string request_to_string(const boost::beast::http::request<boost::beast::http::string_body> &request) {
     // Create a std::ostringstream to store the header
@@ -30,6 +31,7 @@ std::string request_to_string(const boost::beast::http::request<boost::beast::ht
 
     // Get the header as a string
     std::string header_str = header_stream.str();
+    BOOST_LOG_TRIVIAL(info) << "Header: " << header_str;
 
     // Concatenate the header and body, and store in a std::string object
     std::string full_request_str = header_str + request.body();
@@ -42,6 +44,9 @@ std::string request_to_string(const boost::beast::http::request<boost::beast::ht
 int EchoRequestHandler::handle_request(
     const boost::beast::http::request<boost::beast::http::string_body>& request, 
     boost::beast::http::response<boost::beast::http::string_body>& response) {
+    
+    BOOST_LOG_TRIVIAL(info) << "EchoRequestHandler::handle_request called";
+    BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();
 
     response.version(request.version());
     response.result(boost::beast::http::status::ok);

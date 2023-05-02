@@ -8,6 +8,7 @@
 #include <boost/optional/optional_io.hpp>
 #include <boost/beast/http/message.hpp>
 #include "session.h"
+#include "logger.h"
 
 tcp::socket& session::socket() {
     return socket_;
@@ -25,10 +26,12 @@ void session::read_request() {
   boost::beast::http::async_read(socket_, buffer_, *request,
     [this, request](boost::beast::error_code ec, std::size_t bytes_transferred){
       if(!ec){
+        BOOST_LOG_TRIVIAL(info) << "Request from: " << socket_.remote_endpoint().address().to_string() << ":" << socket_.remote_endpoint().port();
         // Create a shared pointer to the response object (lifetime managed by the session)
         std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>> response = std::make_shared<boost::beast::http::response<boost::beast::http::string_body>>();
         // generate error message if failed to generate response
         if(!request_handler_->handle_request(*request, *response)){
+          BOOST_LOG_TRIVIAL(error) << "Failed to generate response";
           boost::beast::http::status status = boost::beast::http::status::internal_server_error;
           response->result(status);  
         }
@@ -36,6 +39,7 @@ void session::read_request() {
       }else{
         // Check if the error is caused by a bad request
         if (ec == boost::beast::http::error::bad_target) {
+          BOOST_LOG_TRIVIAL(error) << "Bad request";
           // Send a 400 Bad Request response
           std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>> response = std::make_shared<boost::beast::http::response<boost::beast::http::string_body>>();
           request_handler_->handle_bad_request(*response);
