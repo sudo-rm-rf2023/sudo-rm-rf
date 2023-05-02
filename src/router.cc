@@ -21,12 +21,6 @@ Router* Router::make_router(std::vector<RouterEntry> router_entries) {
     return router;
 }
 
-// Helper function to make sure a path is local to the current working directory
-// Intended to be called by Router to make sure baseDir parsed from ConfigManager is local.
-std::string ConvertToLocalPath(std::string baseDir){
-    return "./" + baseDir;
-}
-
 // return 1 if entry is successfully registered
 int Router::register_handler(RouterEntry entry){
     std::string target = entry.request_target;
@@ -38,7 +32,7 @@ int Router::register_handler(RouterEntry entry){
             handler = std::make_unique<EchoRequestHandler>();
             break;
         case STATIC_HANDLER:
-            handler = std::make_unique<StaticRequestHandler>(ConvertToLocalPath(base_dir));
+            handler = std::make_unique<StaticRequestHandler>(base_dir);
             break;
         default:
             break;
@@ -67,7 +61,8 @@ int Router::assign_request(
     if (handler){
         // copy the request and remove the path to the handler in the request's path
         boost::beast::http::request<boost::beast::http::string_body> parsed_request = request;
-        parsed_request.target(target.substr(offset));
+        std::string new_target = target.substr(offset);
+        parsed_request.target(new_target.empty() ? "/" : new_target); // set target to '/' if empty.
         handler->handle_request(parsed_request, response);
     }
     else {

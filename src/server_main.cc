@@ -5,6 +5,7 @@
 
 #include "server.h"
 #include "logger.h"
+#include "router.h"
 
 
 int main(int argc, char *argv[]) {
@@ -29,7 +30,12 @@ int main(int argc, char *argv[]) {
             std::cerr << "Invalid config file\n";
             return 1;
         }
-        server s(io_service, config_manager);
+        Router *router = Router::make_router(config_manager->getRouterEntries());
+        if(router == nullptr){
+            BOOST_LOG_TRIVIAL(error) << "Error Creating router.";
+            return 1;
+        }
+        server s(io_service, config_manager, router);
         io_service.run();
     } catch (std::exception &e) {
         BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what();

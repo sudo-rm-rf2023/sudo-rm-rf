@@ -1,5 +1,6 @@
 #include "session.h"
 #include "gtest/gtest.h"
+#include "router.h"
 
 class sessionTest : public ::testing::Test {
 protected:
@@ -9,12 +10,11 @@ protected:
     }
     boost::asio::io_service io_service;
     session *test_session;
-    RequestHandler* echo_request_handler;
 };
 
 TEST_F(sessionTest, StartSession) {
-    echo_request_handler = new EchoRequestHandler();
-    test_session = session::makeSession(io_service, echo_request_handler);
+    Router router = Router(); // TODO: make this more elegant.
+    test_session = session::makeSession(io_service, &router);
     test_session->start();
     return;
 }

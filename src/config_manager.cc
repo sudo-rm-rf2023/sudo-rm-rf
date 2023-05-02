@@ -42,7 +42,6 @@ ConfigManager* ConfigManager::makeConfigManager(const char *config_file) {
 // Return false if the block is invalid;
 // Store a RouterEntry to memory and return true if successful.
 // The request_path has to be non-empty, start with a '/', and does not end with a '/'. "/" is OK.
-// The baseDir must start with a '/'.
 // The location block must follow one of the following:
 //  1. Have serveType = echo with no baseDir statement;
 //  2. Have a baseDir statement;
@@ -92,7 +91,7 @@ bool ConfigManager::ReadLocation(const std::string& request_path, const NginxCon
           return false; // Unknown serveType
         }
     } else if (first_key_word == CONFIG_KW_BASEDIR){ // ReadbaseDir
-        if (value.size() == 0 || value[0] != '/'){
+        if (value.size() == 0){
           BOOST_LOG_TRIVIAL(error) << "Invalid baseDir statement.\n";
           return false;
         }

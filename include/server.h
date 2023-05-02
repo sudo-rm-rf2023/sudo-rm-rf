@@ -11,12 +11,13 @@
 
 #include "session.h"
 #include "config_manager.h"
+#include "router.h"
 
 using boost::asio::ip::tcp;
 
 class server {
 public:
-  server(boost::asio::io_service& io_service, ConfigManager* config_manager);
+  server(boost::asio::io_service& io_service, ConfigManager* config_manager, Router* router);
   server(boost::asio::io_service& io_service, short port) // Deprecate this
     : io_service_(io_service),
       acceptor_(io_service, tcp::endpoint(tcp::v4(), port)){
@@ -34,6 +35,7 @@ private:
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
   std::unique_ptr<ConfigManager> config_manager_;
+  std::unique_ptr<Router> router_;
 
   boost::asio::signal_set signals_ = boost::asio::signal_set(io_service_, SIGINT, SIGTERM);
 };

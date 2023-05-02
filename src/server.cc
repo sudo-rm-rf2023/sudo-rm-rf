@@ -11,21 +11,19 @@
 #include "server.h"
 #include "logger.h"
 
-server::server(boost::asio::io_service &io_service, ConfigManager *config_manager) : io_service_(io_service), acceptor_(io_service) {
+server::server(boost::asio::io_service &io_service, ConfigManager *config_manager, Router *router) : io_service_(io_service), acceptor_(io_service) {
 
-    // set up config manager and the smart pointer: https://learn.microsoft.com/en-us/cpp/cpp/how-to-create-and-use-unique-ptr-instances
     config_manager_ = std::unique_ptr<ConfigManager>(config_manager);
+    router_ = std::unique_ptr<Router>(router);
     acceptor_ = boost::asio::ip::tcp::acceptor(io_service, tcp::endpoint(tcp::v4(), config_manager_->port()));
 
     SetUpSignalHandlers();
     BOOST_LOG_TRIVIAL(info) << "Port Number:" << config_manager_->port() << "\n";
-    printf("Port Number:%d\n", config_manager_->port());
     start_accept();
 }
 
 void server::start_accept() {
-    RequestHandler* echo_request_handler = new EchoRequestHandler();
-    session *new_session = session::makeSession(io_service_, echo_request_handler);
+    session *new_session = session::makeSession(io_service_, router_.get());
     acceptor_.async_accept(new_session->socket(),
                            boost::bind(&server::handle_accept, this, new_session,
                                        boost::asio::placeholders::error));
@@ -35,11 +33,9 @@ void server::handle_accept(session *new_session,
                            const boost::system::error_code &error) {
     if (!error) {
         BOOST_LOG_TRIVIAL(info) << "New Connection.";
-        printf("New Connection.\n");
         new_session->start();
     } else {
         BOOST_LOG_TRIVIAL(error) << "Accept failed.";
-        printf("Accept failed.\n");
         delete new_session;
     }
 

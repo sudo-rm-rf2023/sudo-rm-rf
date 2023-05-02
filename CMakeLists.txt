@@ -48,7 +48,7 @@ add_library(router_lib src/router.cc)
 
 target_link_libraries(config_manager_lib config_parser_lib)
 target_link_libraries(server_lib config_manager_lib session_lib logger_lib)
-target_link_libraries(session_lib echo_handler_lib static_handler_lib)
+target_link_libraries(session_lib echo_handler_lib static_handler_lib router_lib)
 target_link_libraries(router_lib echo_handler_lib static_handler_lib)
 
 # Link Boost libraries
@@ -61,7 +61,7 @@ target_link_libraries(echo_handler_lib logger_lib)
 target_link_libraries(session_lib logger_lib)
 
 add_executable(server src/server_main.cc)
-target_link_libraries(server Boost::system server_lib session_lib echo_handler_lib)
+target_link_libraries(server Boost::system server_lib session_lib echo_handler_lib router_lib)
 
 # config parser test
 add_executable(config_parser_test tests/config_parser_test.cc)

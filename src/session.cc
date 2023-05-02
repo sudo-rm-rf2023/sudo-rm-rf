@@ -30,8 +30,8 @@ void session::read_request() {
         // Create a shared pointer to the response object (lifetime managed by the session)
         std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>> response = std::make_shared<boost::beast::http::response<boost::beast::http::string_body>>();
         // generate error message if failed to generate response
-        if(!request_handler_->handle_request(*request, *response)){
-          BOOST_LOG_TRIVIAL(error) << "Failed to generate response";
+        if(!router_->assign_request(*request, *response)){
+          BOOST_LOG_TRIVIAL(error) << "Failed to generate response.";
           boost::beast::http::status status = boost::beast::http::status::internal_server_error;
           response->result(status);  
         }
@@ -42,7 +42,7 @@ void session::read_request() {
           BOOST_LOG_TRIVIAL(error) << "Bad request";
           // Send a 400 Bad Request response
           std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>> response = std::make_shared<boost::beast::http::response<boost::beast::http::string_body>>();
-          request_handler_->handle_bad_request(*response);
+          router_->handle_bad_request(*response);
           boost::beast::http::write(socket_, *response); //TODO: refactor session class
         } else {
           fprintf(stderr, "Error in async_read (I/O): %s\n", ec.message().c_str());

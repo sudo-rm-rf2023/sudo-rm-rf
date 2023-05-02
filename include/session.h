@@ -14,6 +14,7 @@
 
 #include "echo_request_handler.h"
 #include "static_request_handler.h"
+#include "router.h"
 
 using boost::asio::ip::tcp;
 
@@ -23,12 +24,12 @@ public:
   ~session(){
     printf("Session deleted.\n");
   }
-  session(boost::asio::io_service& io_service, RequestHandler* request_handler) :socket_(io_service), request_handler_(request_handler) {
+  session(boost::asio::io_service& io_service, Router* router) :socket_(io_service), router_(router) {
     printf("Session created.\n");
   }
 
-  static session* makeSession(boost::asio::io_service& io_service, RequestHandler* request_handler){
-    return new session(io_service, request_handler);
+  static session* makeSession(boost::asio::io_service& io_service, Router* router){
+    return new session(io_service, router);
   }
 
   tcp::socket& socket();
@@ -41,9 +42,7 @@ private:
 
   tcp::socket socket_;
 
-
-  // TODO (qianli): Change this for Dependency Injection
-  std::unique_ptr<RequestHandler> request_handler_;
+  Router* router_;
 
   boost::beast::flat_buffer buffer_;
 

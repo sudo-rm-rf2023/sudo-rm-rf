@@ -12,7 +12,8 @@
 class RequestHandlerTest : public ::testing::Test {
 protected:
     RequestHandlerTest() {
-        boost::beast::http::request<boost::beast::http::string_body> request_{boost::beast::http::verb::post, "/", 11};
+        request_ =boost::beast::http::request<boost::beast::http::string_body>({boost::beast::http::verb::post, "/", 11});
+        
         request_.set(boost::beast::http::field::content_type, "text/plain");
         handler_ = new EchoRequestHandler;
     }
@@ -25,7 +26,10 @@ protected:
 };
 
 TEST_F(RequestHandlerTest, HelloWorld){
-    request_.body() = "Hello, world!"; 
+    request_.body() = "Hello, world!";
+    ASSERT_EQ(request_.method_string(), std::string("POST"));
+    ASSERT_EQ(request_.target(), std::string("/"));
+
     ASSERT_EQ(handler_->handle_request(request_, response_), 1);
     for (const auto &field : request_) {
         EXPECT_TRUE(response_.body().find(field.name_string().to_string()) != std::string::npos);
@@ -34,6 +38,7 @@ TEST_F(RequestHandlerTest, HelloWorld){
     EXPECT_EQ(response_.result_int(), 200);
     EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
     EXPECT_TRUE(response_.body().find("Hello, world!") != std::string::npos);
+    EXPECT_TRUE(response_.body().find("POST / HTTP/1.1") != std::string::npos);
 }
 
 TEST_F(RequestHandlerTest, FakeDelimiter){
