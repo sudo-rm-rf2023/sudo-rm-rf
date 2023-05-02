@@ -4,6 +4,7 @@
 #include "echo_request_handler.h"
 #include "static_request_handler.h"
 #include "gtest/gtest.h"
+#include "logger.h"
 
 #include <vector>
 #include <string>
@@ -11,6 +12,7 @@
 class RouterTest : public ::testing::Test {
 protected:
     RouterTest() {
+        logger_init();
         entry1_.request_target = "/echo";
         entry1_.base_dir = "";
         entry1_.handler_type = ECHO_HANDLER;

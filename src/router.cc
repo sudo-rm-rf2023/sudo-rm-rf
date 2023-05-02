@@ -1,15 +1,15 @@
 #include "router.h"
 #include "echo_request_handler.h"
 #include "static_request_handler.h"
+#include "logger.h"
 #include <cstddef>
 #include <memory>
 #include <sched.h>
 #include <sstream>
 #include <iostream>
 
-// TODO: update printf to loggin with boost
 Router* Router::make_router(std::vector<RouterEntry> router_entries) {
-    printf("Setting up router ...\n");
+    BOOST_LOG_TRIVIAL(info) << "Setting up router..";
     Router* router = new Router();
     for (RouterEntry entry : router_entries){
         if (!router->register_handler(entry)){
@@ -17,7 +17,7 @@ Router* Router::make_router(std::vector<RouterEntry> router_entries) {
             return nullptr;
         }
     }
-    printf("Router setup complete\n");
+    BOOST_LOG_TRIVIAL(info) << "Router setup complete";
     return router;
 }
 
@@ -43,7 +43,7 @@ int Router::register_handler(RouterEntry entry){
         handler_table_[target] = std::move(handler);
     }
     else {
-        printf("invalid handler type received for target %s\n", target.c_str());
+        BOOST_LOG_TRIVIAL(error) << "invalid handler type received for target " << target;
         return 0;
     }
     return 1;
@@ -66,7 +66,7 @@ int Router::assign_request(
         handler->handle_request(parsed_request, response);
     }
     else {
-        printf("handler not found for request with target %s\n", target.c_str());
+        BOOST_LOG_TRIVIAL(error) << "invalid request received for target " << target;
         handle_bad_request(response);
     }
 
@@ -77,7 +77,6 @@ std::string Router::mapping_to_string () {
     std::stringstream handler_stream;
     for (const auto& entry : handler_table_){
         const std::unique_ptr<RequestHandler>& handler = entry.second;
-        // handler_stream << "target: " << entry.first;
         // check the type of handler mapped to the endy
         if (handler->type() == ECHO_HANDLER) {
             handler_stream << entry.first<< " -> echo handler\n";
