@@ -63,6 +63,7 @@ int StaticRequestHandler::handle_request(
 
     // Check if file exists
     std::ifstream file(file_path, std::ios::in | std::ios::binary);
+    // TODO: Check if file is a plain file (not a direcory, soft link, hard link etc).
     if (!file) {
         BOOST_LOG_TRIVIAL(info) << "File not found";
         response.result(boost::beast::http::status::not_found);

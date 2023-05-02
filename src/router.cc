@@ -21,6 +21,12 @@ Router* Router::make_router(std::vector<RouterEntry> router_entries) {
     return router;
 }
 
+// Helper function to make sure a path is local to the current working directory
+// Intended to be called by Router to make sure baseDir parsed from ConfigManager is local.
+std::string ConvertToLocalPath(std::string baseDir){
+    return "./" + baseDir;
+}
+
 // return 1 if entry is successfully registered
 int Router::register_handler(RouterEntry entry){
     std::string target = entry.request_target;
@@ -32,7 +38,7 @@ int Router::register_handler(RouterEntry entry){
             handler = std::make_unique<EchoRequestHandler>();
             break;
         case STATIC_HANDLER:
-            handler = std::make_unique<StaticRequestHandler>(base_dir);
+            handler = std::make_unique<StaticRequestHandler>(ConvertToLocalPath(base_dir));
             break;
         default:
             break;
