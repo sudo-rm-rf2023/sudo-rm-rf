@@ -8,15 +8,21 @@
 #include <iostream>
 
 // TODO: update printf to loggin with boost
-Router::Router(std::vector<RouterEntry> router_entries) {
+Router* Router::make_router(std::vector<RouterEntry> router_entries) {
     printf("Setting up router ...\n");
+    Router* router = new Router();
     for (RouterEntry entry : router_entries){
-        register_handler(entry);
+        if (!router->register_handler(entry)){
+            delete router;
+            return nullptr;
+        }
     }
     printf("Router setup complete\n");
+    return router;
 }
 
-void Router::register_handler(RouterEntry entry){
+// return 1 if entry is successfully registered
+int Router::register_handler(RouterEntry entry){
     std::string target = entry.request_target;
     std::string base_dir = entry.base_dir;
     std::unique_ptr<RequestHandler> handler(nullptr);
@@ -37,8 +43,10 @@ void Router::register_handler(RouterEntry entry){
         handler_table_[target] = std::move(handler);
     }
     else {
-        printf("invalid handler type received for target %s, skipping hander assignment for this target\n", target.c_str());
+        printf("invalid handler type received for target %s\n", target.c_str());
+        return 0;
     }
+    return 1;
 }
 
 

@@ -15,9 +15,9 @@
 class Router {
     public:
         Router() {}
-        Router(std::vector<RouterEntry> router_entries);
+        static Router* make_router(std::vector<RouterEntry> router_entries);
 
-        void register_handler(RouterEntry entry);
+        int register_handler(RouterEntry entry);
 
         int assign_request(
         const boost::beast::http::request<boost::beast::http::string_body>& request,
