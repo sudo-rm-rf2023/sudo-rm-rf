@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "config_parser.h"
+#include "logger.h"
 
 std::string NginxConfig::ToString(int depth) {
   std::string serialized_config;
@@ -203,7 +204,7 @@ bool NginxConfigParser::Parse(std::istream* config_file, NginxConfig* config) {
   while (true) {
     std::string token;
     token_type = ParseToken(config_file, &token);
-    printf ("%s: %s\n", TokenTypeAsString(token_type), token.c_str());
+    // printf ("%s: %s\n", TokenTypeAsString(token_type), token.c_str());
     if (token_type == TOKEN_TYPE_ERROR) {
       break;
     }
@@ -273,9 +274,6 @@ bool NginxConfigParser::Parse(std::istream* config_file, NginxConfig* config) {
     last_token_type = token_type;
   }
 
-  printf ("Bad transition from %s to %s\n",
-          TokenTypeAsString(last_token_type),
-          TokenTypeAsString(token_type));
   return false;
 }
 
@@ -283,7 +281,7 @@ bool NginxConfigParser::Parse(const char* file_name, NginxConfig* config) {
   std::ifstream config_file;
   config_file.open(file_name);
   if (!config_file.good()) {
-    printf ("Failed to open config file: %s\n", file_name);
+    BOOST_LOG_TRIVIAL(error) << "Failed to open config file: " << file_name << "\n";
     return false;
   }
 
