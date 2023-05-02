@@ -8,6 +8,8 @@ WORKDIR /usr/src/projects/sudo-rm-rf/build_coverage
 
 # Build and test
 RUN cmake -DCMAKE_BUILD_TYPE=Coverage ..
+# TODO: Fix this
+RUN cp -r ../static ./static
 RUN make coverage
 
 

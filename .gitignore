@@ -3,5 +3,5 @@
 build
 build_*
 mirror
-tests/**/actual*.txt
+tests/**/actual*
 **/log

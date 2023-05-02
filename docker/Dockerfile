@@ -9,6 +9,8 @@ WORKDIR /usr/src/projects/sudo-rm-rf/build
 # Build and test
 RUN cmake ..
 RUN make
+# TODO: Fix this
+RUN cp -r ../static ./static
 RUN ctest --output-on_failure
 
 
@@ -19,6 +21,7 @@ FROM ubuntu:jammy as deploy
 # Copy server output binary to "."
 COPY --from=builder /usr/src/projects/sudo-rm-rf/build/bin/server .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_config .
+COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/assign4.conf .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/static ./static
 
 # Expose some port(s)
@@ -30,4 +33,4 @@ ENTRYPOINT ["./server"]
 
 # Use CMD to specify arguments to ENTRYPOINT
 # Update with real server args
-CMD ["server_config"]
+CMD ["assign4.conf"]

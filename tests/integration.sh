@@ -25,8 +25,11 @@ ENDCOLOR=$([ "$USE_COLOR" = "true" ] && echo "\e[0m" || echo "")
 
 # Configuration
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"  # Get the directory of this script
-TEST_CONFIG="../server_config"
+TEST_CONFIG="${SCRIPT_DIR}/integration/test.conf"
 TEST_PORT=8080
+
+echo -e "${BOLDBLUE}Script directory: ${SCRIPT_DIR}${ENDCOLOR}"
+echo -e "${BOLDBLUE}Config: ${TEST_CONFIG}${ENDCOLOR}"
 
 # Initialize variables for test results
 TOTAL_TESTS=0
@@ -48,7 +51,7 @@ echo -e "${BOLDBLUE}${COMMAND_NAME}${ENDCOLOR}"
 
 # Run the web server binary with the test config file in the background
 # Assume script is in the tests directory
-$COMMAND_NAME "${SCRIPT_DIR}/$TEST_CONFIG" &
+$COMMAND_NAME "$TEST_CONFIG" &
 SERVER_PID=$!
 
 # Give the server some time to start
@@ -75,7 +78,7 @@ done
 # Shut down the web server
 kill $SERVER_PID
 # Remove the temporary files
-rm -f ${SCRIPT_DIR}/integration/actual_*
+# rm -f ${SCRIPT_DIR}/integration/actual_*
 
 
 # Calculate and print pass rate
