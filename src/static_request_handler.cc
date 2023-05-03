@@ -57,7 +57,8 @@ int StaticRequestHandler::handle_request(
 
     // Build file path from request target
     int offset = get_request_path().length();
-    std::string file_path = base_dir_ + request.target().to_string().substr(offset);
+    std::string requested_file = request.target().to_string().substr(offset);
+    std::string file_path = base_dir_ + requested_file;
     BOOST_LOG_TRIVIAL(info) << "StaticRequestHandler::handle_request called";
     BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();
     BOOST_LOG_TRIVIAL(info) << "file_path: " << file_path;

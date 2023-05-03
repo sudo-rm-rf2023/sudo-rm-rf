@@ -50,14 +50,14 @@ TEST_F(ConfigManagerTest, ValidRouterEntries){
 
     EXPECT_THAT(router_entries, SizeIs(3));
     EXPECT_THAT(router_entries,ElementsAre(
-    AllOf(  Field(&RouterEntry::request_target, "/"),
+    AllOf(  Field(&RouterEntry::request_path, "/"),
             Field(&RouterEntry::base_dir, "/data"),
             Field(&RouterEntry::handler_type,STATIC_HANDLER)),
     AllOf(
-            Field(&RouterEntry::request_target, "/echo"),
+            Field(&RouterEntry::request_path, "/echo"),
             Field(&RouterEntry::handler_type,ECHO_HANDLER)),
     AllOf(
-            Field(&RouterEntry::request_target, "/webpage"),
+            Field(&RouterEntry::request_path, "/webpage"),
             Field(&RouterEntry::base_dir, "/data/www"),
             Field(&RouterEntry::handler_type,STATIC_HANDLER))
     ));
@@ -71,14 +71,14 @@ TEST_F(ConfigManagerTest, ValidRouterEntriesWithRootOnly){
 
     EXPECT_THAT(router_entries, SizeIs(3));
     EXPECT_THAT(router_entries,ElementsAre(
-    AllOf(  Field(&RouterEntry::request_target, "/static1"),
+    AllOf(  Field(&RouterEntry::request_path, "/static1"),
             Field(&RouterEntry::base_dir, "/data"),
             Field(&RouterEntry::handler_type,STATIC_HANDLER)),
     AllOf(
-            Field(&RouterEntry::request_target, "/echo"),
+            Field(&RouterEntry::request_path, "/echo"),
             Field(&RouterEntry::handler_type,ECHO_HANDLER)),
     AllOf(
-            Field(&RouterEntry::request_target, "/webpage"),
+            Field(&RouterEntry::request_path, "/webpage"),
             Field(&RouterEntry::base_dir, "/webpages"),
             Field(&RouterEntry::handler_type,STATIC_HANDLER))
     ));

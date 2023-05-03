@@ -62,7 +62,7 @@ bool ConfigManager::ReadLocation(const std::string& request_path, const NginxCon
   };
 
   RouterEntry new_entry;
-  new_entry.request_target = request_path;
+  new_entry.request_path = request_path;
 
   // duplication check
   bool handler_set = false;

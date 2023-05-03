@@ -13,15 +13,15 @@ class RouterTest : public ::testing::Test {
 protected:
     RouterTest() {
         logger_init();
-        entry1_.request_target = "/echo";
+        entry1_.request_path = "/echo";
         entry1_.base_dir = "";
         entry1_.handler_type = ECHO_HANDLER;
 
-        entry2_.request_target = "/static";
+        entry2_.request_path = "/static";
         entry2_.base_dir = "../static";
         entry2_.handler_type = STATIC_HANDLER;
 
-        entry3_.request_target = "/";
+        entry3_.request_path = "/";
         entry3_.base_dir = "";
         entry3_.handler_type = ECHO_HANDLER;
 

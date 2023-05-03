@@ -23,7 +23,7 @@ Router* Router::make_router(std::vector<RouterEntry> router_entries) {
 
 // return 1 if entry is successfully registered
 int Router::register_handler(RouterEntry entry){
-    std::string target = entry.request_target;
+    std::string target = entry.request_path;
     std::string base_dir = entry.base_dir;
     std::unique_ptr<RequestHandler> handler(nullptr);
 
@@ -40,7 +40,7 @@ int Router::register_handler(RouterEntry entry){
     // register the hander to the url in the handler_table if the specified handler
     // type is valid, else skip the registration in question and log the issue
     if (handler){
-        handler->set_request_path(entry.request_target);
+        handler->set_request_path(entry.request_path);
         handler_table_[target] = std::move(handler);
     }
     else {
@@ -86,20 +86,20 @@ std::string Router::mapping_to_string () {
 
 // takes in a string of request path and returns the ptr to the handler with longest 
 // matching path. Returns nullptr if no matches are found
-RequestHandler* Router::route_handler(std::string request_target) {
+RequestHandler* Router::route_handler(std::string request_path) {
     // if the request target is registered in handler_table_
-    auto it = handler_table_.find(request_target);
+    auto it = handler_table_.find(request_path);
     if (it != handler_table_.end()) {
         return it->second.get();
     }
 
     // else search the parent directory
-    size_t pos = request_target.find_last_of('/');
-    if (request_target == "/" || pos == std::string::npos) {
+    size_t pos = request_path.find_last_of('/');
+    if (request_path == "/" || pos == std::string::npos) {
         return nullptr;
     }
 
-    std::string parentDir = request_target.substr(0, pos);
+    std::string parentDir = request_path.substr(0, pos);
     if (parentDir.length() == 0){
         parentDir = "/";
     }

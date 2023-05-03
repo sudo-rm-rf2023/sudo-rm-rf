@@ -9,7 +9,8 @@ enum HandlerType {
 };
 
 struct RouterEntry {
-    std::string request_target;
+    // std::string request_target;
+    std::string request_path;
     std::string base_dir;
     HandlerType handler_type;
 };
