@@ -40,6 +40,7 @@ int Router::register_handler(RouterEntry entry){
     // register the hander to the url in the handler_table if the specified handler
     // type is valid, else skip the registration in question and log the issue
     if (handler){
+        handler->set_request_path(entry.request_target);
         handler_table_[target] = std::move(handler);
     }
     else {
@@ -55,15 +56,10 @@ int Router::assign_request(
     boost::beast::http::response<boost::beast::http::string_body>& response){
 
     std::string target = request.target().to_string();
-    int offset = 0;
-    RequestHandler* handler = route_handler(target, offset);
+    RequestHandler* handler = route_handler(target);
     
     if (handler){
-        // copy the request and remove the path to the handler in the request's path
-        boost::beast::http::request<boost::beast::http::string_body> parsed_request = request;
-        std::string new_target = target.substr(offset);
-        parsed_request.target(new_target.empty() ? "/" : new_target); // set target to '/' if empty.
-        handler->handle_request(parsed_request, response);
+        handler->handle_request(request, response);
     }
     else {
         BOOST_LOG_TRIVIAL(error) << "invalid request received for target " << target;
@@ -90,18 +86,16 @@ std::string Router::mapping_to_string () {
 
 // takes in a string of request path and returns the ptr to the handler with longest 
 // matching path. Returns nullptr if no matches are found
-RequestHandler* Router::route_handler(std::string request_target, int& offset) {
+RequestHandler* Router::route_handler(std::string request_target) {
     // if the request target is registered in handler_table_
     auto it = handler_table_.find(request_target);
     if (it != handler_table_.end()) {
-        offset = request_target.length();
         return it->second.get();
     }
 
     // else search the parent directory
     size_t pos = request_target.find_last_of('/');
     if (request_target == "/" || pos == std::string::npos) {
-        offset = 0;
         return nullptr;
     }
 
@@ -109,7 +103,7 @@ RequestHandler* Router::route_handler(std::string request_target, int& offset) {
     if (parentDir.length() == 0){
         parentDir = "/";
     }
-    return route_handler(parentDir, offset);
+    return route_handler(parentDir);
 }
 
 int Router::handle_bad_request(boost::beast::http::response<boost::beast::http::string_body>& response){

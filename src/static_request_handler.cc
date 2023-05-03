@@ -56,7 +56,8 @@ int StaticRequestHandler::handle_request(
     response.result(boost::beast::http::status::ok);
 
     // Build file path from request target
-    std::string file_path = base_dir_ + request.target().to_string();
+    int offset = get_request_path().length();
+    std::string file_path = base_dir_ + request.target().to_string().substr(offset);
     BOOST_LOG_TRIVIAL(info) << "StaticRequestHandler::handle_request called";
     BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();
     BOOST_LOG_TRIVIAL(info) << "file_path: " << file_path;

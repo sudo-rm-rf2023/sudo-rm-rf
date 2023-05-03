@@ -32,7 +32,7 @@ class Router {
 
         // returns a pointer to the handler to be invoked and set path_idx to the 
         // index of the '/' after the path to handler
-        RequestHandler* route_handler(std::string request_target, int& offset);
+        RequestHandler* route_handler(std::string request_target);
 };
 
 #endif

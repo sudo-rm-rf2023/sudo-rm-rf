@@ -24,6 +24,14 @@ class RequestHandler {
         }
 
         virtual HandlerType type()=0;
+        void set_request_path (std::string path) {
+            request_path = path;
+        }
+        std::string get_request_path (){
+            return request_path;
+        }
+    private: 
+        std::string request_path;
 };
 
 #endif
