@@ -5,48 +5,22 @@
 #include <unordered_map>
 
 #include "logger.h"
-
+#include "utils.h"
 
 // Constructor
-StaticRequestHandler::StaticRequestHandler(const std::string base_dir)
-    : base_dir_(base_dir) {
-    BOOST_LOG_TRIVIAL(info) << "StaticRequestHandler created";
-    BOOST_LOG_TRIVIAL(info) << "base_dir: " << base_dir_;
+StaticRequestHandler::StaticRequestHandler(const RequestHandler::Options& options){
+    request_path_ = options.request_path;
+    base_dir_ = options.base_dir.value_or(std::string());
+    BOOST_LOG_TRIVIAL(info) << "StaticRequestHandler created. Base directory:" << base_dir_;
 }
 
-// Destructor
-StaticRequestHandler::~StaticRequestHandler() {
-}
-
-std::string StaticRequestHandler::mime_type(const std::string& path) {
-    // Mapping of file extensions to MIME types
-    static const std::unordered_map<std::string, std::string> mime_types{
-        {".html", "text/html"},
-        {".css", "text/css"},
-        {".js", "application/javascript"},
-        {".json", "application/json"},
-        {".png", "image/png"},
-        {".jpg", "image/jpeg"},
-        {".jpeg", "image/jpeg"},
-        {".gif", "image/gif"},
-        {".svg", "image/svg+xml"},
-        {".ico", "image/x-icon"},
-        {".txt", "text/plain"},
-        // Add more MIME types here as needed
-    };
-
-    // Find the last '.' in the path to determine the file extension
-    std::size_t pos = path.find_last_of('.');
-    if (pos != std::string::npos) {
-        std::string ext = path.substr(pos);
-        auto it = mime_types.find(ext);
-        if (it != mime_types.end()) {
-            return it->second;
-        }
+// Factory Method
+StaticRequestHandler* StaticRequestHandler::makeStaticRequestHandler(const RequestHandler::Options& options){
+    if(options.base_dir.has_value()){ 
+        return new StaticRequestHandler(options);
+    } else { //invalid options: StaticRequestHandler requires a base_dir.
+        return nullptr;
     }
-
-    // Default MIME type if the file extension is not found or unknown
-    return "application/octet-stream";
 }
 
 int StaticRequestHandler::handle_request(
@@ -57,7 +31,7 @@ int StaticRequestHandler::handle_request(
     response.result(boost::beast::http::status::ok);
 
     // Build file path from request target
-    int offset = get_request_path().length();
+    int offset = request_path_.length();
     std::string requested_file = request.target().to_string().substr(offset);
     std::string file_path = base_dir_ + requested_file;
     BOOST_LOG_TRIVIAL(info) << "StaticRequestHandler::handle_request called";
@@ -90,7 +64,3 @@ int StaticRequestHandler::handle_request(
 
     return 0; // Return 0 to indicate success
     }
-
-HandlerType StaticRequestHandler::type() {
-    return STATIC_HANDLER;
-}

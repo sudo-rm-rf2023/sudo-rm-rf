@@ -4,7 +4,6 @@
 #include "echo_request_handler.h"
 #include "static_request_handler.h"
 #include "gtest/gtest.h"
-
 #include <vector>
 #include <string>
 
@@ -40,13 +39,7 @@ protected:
     boost::beast::http::response<boost::beast::http::string_body> response_;
 };
 
-// check if the router is created with the correct handler mappings
-TEST_F(RouterTest, CorrectMappings) {
-    std::string mapping = router_->mapping_to_string();
-    EXPECT_TRUE(mapping.find("/static -> static handler") != std::string::npos);
-    EXPECT_TRUE(mapping.find("/echo -> echo handler") != std::string::npos);
-    EXPECT_TRUE(mapping.find("/ -> echo handler") != std::string::npos);
-}
+// TODO: Modify the tests to use mock RequestHandlers
 
 // check if the router correctly assigns the http echo requests
 TEST_F(RouterTest, AssignEcho) {

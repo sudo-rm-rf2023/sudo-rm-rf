@@ -6,11 +6,19 @@
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/string_body.hpp>
 #include <boost/beast/http/status.hpp>
+#include <optional>
 
 #include "utils.h"
 
 class RequestHandler {
     public:
+        struct Options{ // A parameter object for the RequestHandler constructors.
+            std::string request_path;
+            std::optional<std::string> base_dir;
+        };
+
+        // A non-zero return value indicates error.
+        // Input: request. Output: response.
         virtual int handle_request(
         const boost::beast::http::request<boost::beast::http::string_body>& request,
         boost::beast::http::response<boost::beast::http::string_body>& response) = 0;
@@ -22,16 +30,6 @@ class RequestHandler {
             response.prepare_payload();
             return 1;
         }
-
-        virtual HandlerType type()=0;
-        void set_request_path (std::string path) {
-            request_path = path;
-        }
-        std::string get_request_path (){
-            return request_path;
-        }
-    private: 
-        std::string request_path;
 };
 
 #endif

@@ -17,17 +17,13 @@ class Router {
         Router() {}
         static Router* make_router(std::vector<RouterEntry> router_entries);
 
-        int register_handler(RouterEntry entry);
-
         int assign_request(
         const boost::beast::http::request<boost::beast::http::string_body>& request,
         boost::beast::http::response<boost::beast::http::string_body>& response);
 
-        // returns a string representation of the handler mapping
-        std::string mapping_to_string ();
-
         int handle_bad_request(boost::beast::http::response<boost::beast::http::string_body>& response);
     private:
+        int register_handler(RouterEntry entry);
         std::unordered_map<std::string, std::unique_ptr<RequestHandler>> handler_table_;
 
         // returns a pointer to the handler to be invoked and set path_idx to the 

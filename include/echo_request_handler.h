@@ -6,13 +6,14 @@
 
 class EchoRequestHandler : public RequestHandler {
     public:
-        EchoRequestHandler(){};
+        static EchoRequestHandler* makeEchoRequestHandler(const RequestHandler::Options& options);
 
         int handle_request(
         const boost::beast::http::request<boost::beast::http::string_body>& request,
         boost::beast::http::response<boost::beast::http::string_body>& response) override;
-
-        virtual HandlerType type() override;
+    private:
+        EchoRequestHandler(const RequestHandler::Options& options);
+        std::string request_path_;
 };
 
 #endif

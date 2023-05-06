@@ -23,28 +23,27 @@ Router* Router::make_router(std::vector<RouterEntry> router_entries) {
 
 // return 1 if entry is successfully registered
 int Router::register_handler(RouterEntry entry){
-    std::string target = entry.request_path;
-    std::string base_dir = entry.base_dir;
-    std::unique_ptr<RequestHandler> handler(nullptr);
+    RequestHandler::Options handler_options = {entry.request_path, entry.base_dir};
+    RequestHandler* handler = nullptr;
 
     switch(entry.handler_type){
         case ECHO_HANDLER:
-            handler = std::make_unique<EchoRequestHandler>();
+            handler = EchoRequestHandler::makeEchoRequestHandler(handler_options);
             break;
         case STATIC_HANDLER:
-            handler = std::make_unique<StaticRequestHandler>(base_dir);
+            handler = StaticRequestHandler::makeStaticRequestHandler(handler_options);
             break;
         default:
             break;
     }
+
     // register the hander to the url in the handler_table if the specified handler
     // type is valid, else skip the registration in question and log the issue
-    if (handler){
-        handler->set_request_path(entry.request_path);
-        handler_table_[target] = std::move(handler);
+    if (handler){;
+        handler_table_[entry.request_path] = std::unique_ptr<RequestHandler>(handler);
     }
     else {
-        BOOST_LOG_TRIVIAL(error) << "invalid handler type received for target " << target;
+        BOOST_LOG_TRIVIAL(error) << "invalid handler type received for target " << entry.request_path;
         return 0;
     }
     return 1;
@@ -67,21 +66,6 @@ int Router::assign_request(
     }
 
     return 1;
-}
-
-std::string Router::mapping_to_string () {
-    std::stringstream handler_stream;
-    for (const auto& entry : handler_table_){
-        const std::unique_ptr<RequestHandler>& handler = entry.second;
-        // check the type of handler mapped to the endy
-        if (handler->type() == ECHO_HANDLER) {
-            handler_stream << entry.first<< " -> echo handler\n";
-        }
-        else if (handler->type() == STATIC_HANDLER) {
-            handler_stream << entry.first<< " -> static handler\n";
-        }
-    }
-    return handler_stream.str();
 }
 
 // takes in a string of request path and returns the ptr to the handler with longest 

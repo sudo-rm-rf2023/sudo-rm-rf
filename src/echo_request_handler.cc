@@ -39,7 +39,13 @@ std::string request_to_string(const boost::beast::http::request<boost::beast::ht
     return full_request_str;
 }
 
+EchoRequestHandler::EchoRequestHandler(const RequestHandler::Options& options){
+    request_path_ = options.request_path;
+}
 
+EchoRequestHandler* EchoRequestHandler::makeEchoRequestHandler(const RequestHandler::Options& options){
+    return new EchoRequestHandler(options);
+}
 
 int EchoRequestHandler::handle_request(
     const boost::beast::http::request<boost::beast::http::string_body>& request, 
@@ -55,9 +61,5 @@ int EchoRequestHandler::handle_request(
     response.set(boost::beast::http::field::content_type, "text/plain");
     response.prepare_payload(); // set content-length
     printf("Response Generated.\n");
-    return 1;
-}
-
-HandlerType EchoRequestHandler::type() {
-    return ECHO_HANDLER;
+    return 0;
 }

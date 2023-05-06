@@ -5,16 +5,14 @@
 
 class StaticRequestHandler : public RequestHandler {
     public:
-        StaticRequestHandler(const std::string base_dir);
-        ~StaticRequestHandler();
+        static StaticRequestHandler* makeStaticRequestHandler(const RequestHandler::Options& options);
 
         int handle_request(
         const boost::beast::http::request<boost::beast::http::string_body>& request,
         boost::beast::http::response<boost::beast::http::string_body>& response) override;
-
-        virtual HandlerType type() override;
     private:
-        std::string mime_type(const std::string& path);
+        StaticRequestHandler(const RequestHandler::Options& options);
+        std::string request_path_;
         std::string base_dir_;
 };
 

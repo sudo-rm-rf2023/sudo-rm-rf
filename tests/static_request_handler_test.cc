@@ -5,34 +5,68 @@
 #include <iostream>
 #include <string>
 
+// TODO: Use files dedicated to unittests
+// TODO: Test getting files from sub-directories
+// TODO: Test more complicated request_path
+// TODO: Test the handler's response to non-GET requests
 class StaticRequestHandlerTest : public ::testing::Test {
 protected:
-    StaticRequestHandlerTest() {
-        boost::beast::http::request<boost::beast::http::string_body> request_{boost::beast::http::verb::get, "/", 11};
-        request_.set(boost::beast::http::field::content_type, "text/plain");
-        handler_ = new StaticRequestHandler("../static");
-    }
-    ~StaticRequestHandlerTest() {
+    StaticRequestHandlerTest() {}
+    ~StaticRequestHandlerTest(){
         delete handler_;
     }
-    StaticRequestHandler *handler_;
+    StaticRequestHandler* handler_;
     boost::beast::http::request<boost::beast::http::string_body> request_;
     boost::beast::http::response<boost::beast::http::string_body> response_;
 };
 
+// Check that base_dir is required
+TEST_F(StaticRequestHandlerTest, InvalidOptions){
+    RequestHandler::Options invalid_options = {/*request_path=*/"/static",
+                                                /*base_dir=*/std::nullopt};
+    handler_ = StaticRequestHandler::makeStaticRequestHandler(invalid_options);
+    EXPECT_EQ(handler_, nullptr);
+}
+
 TEST_F(StaticRequestHandlerTest, ExistingFile) {
-    request_.target("/index.html");
+    RequestHandler::Options options = {/*request_path=*/"/static",
+                                        /*base_dir=*/"../static"};
+    handler_ = StaticRequestHandler::makeStaticRequestHandler(options);
+    ASSERT_NE(handler_, nullptr);
+
+    request_ = {boost::beast::http::verb::get,
+                /*target=*/"/static/index.html", /*version=*/11};
+    
     ASSERT_EQ(handler_->handle_request(request_, response_), 0);
     EXPECT_EQ(response_.result_int(), 200);
     EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/html");
 
-    // Optionally, compare the response body with the expected content of the file
+    // TODO: Compare the response body with the expected content of the file
     // std::string expected_content = "your expected file content";
     // EXPECT_EQ(response_.body(), expected_content);
 }
 
+TEST_F(StaticRequestHandlerTest, ExistingFileWrongRequestPath) {
+    RequestHandler::Options options = {/*request_path=*/"/static",
+                                        /*base_dir=*/"../static"};
+    handler_ = StaticRequestHandler::makeStaticRequestHandler(options);
+    ASSERT_NE(handler_, nullptr);
+
+    request_ = {boost::beast::http::verb::get,
+                /*target=*/"/wrongpath/index.html", /*version=*/11};
+    
+    ASSERT_EQ(handler_->handle_request(request_, response_), 0);
+    EXPECT_EQ(response_.result_int(), 404);
+}
+
 TEST_F(StaticRequestHandlerTest, NonExistingFile) {
-    request_.target("/non_existing_file.html");
+    RequestHandler::Options options = {/*request_path=*/"/data",
+                                        /*base_dir=*/"../static"};
+    handler_ = StaticRequestHandler::makeStaticRequestHandler(options);
+
+    request_ = {boost::beast::http::verb::get,
+                /*target=*/"/data/non_existing_file.html", /*version=*/11};
+
     ASSERT_EQ(handler_->handle_request(request_, response_), 0);
     EXPECT_EQ(response_.result_int(), 404);
     EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
@@ -40,12 +74,18 @@ TEST_F(StaticRequestHandlerTest, NonExistingFile) {
 }
 
 TEST_F(StaticRequestHandlerTest, ContentType) {
-    request_.target("/sudo-rm-rf-command.png");
+    RequestHandler::Options options = {/*request_path=*/"/www/images",
+                                        /*base_dir=*/"../static"};
+    handler_ = StaticRequestHandler::makeStaticRequestHandler(options);
+
+    request_ = {boost::beast::http::verb::get,
+                /*target=*/"/www/images/sudo-rm-rf-command.png", /*version=*/11};
+
     ASSERT_EQ(handler_->handle_request(request_, response_), 0);
     EXPECT_EQ(response_.result_int(), 200);
     EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "image/png");
 
-    // Optionally, compare the response body with the expected content of the file
+    // TODO: Compare the response body with the expected content of the file
     // std::string expected_content = "your expected file content";
     // EXPECT_EQ(response_.body(), expected_content);
 }
