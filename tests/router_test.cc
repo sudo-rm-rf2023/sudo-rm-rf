@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+
 class RouterTest : public ::testing::Test {
 protected:
     RouterTest() {
@@ -33,17 +35,17 @@ protected:
     RouterEntry entry3_;
 
     std::vector<RouterEntry> router_entries_;
-    Router* router_; 
+    Router* router_;
 
-    boost::beast::http::request<boost::beast::http::string_body> request_;
-    boost::beast::http::response<boost::beast::http::string_body> response_;
+    http::request<http::string_body> request_;
+    http::response<http::string_body> response_;
 };
 
 // TODO: Modify the tests to use mock RequestHandlers
 
 // check if the router correctly assigns the http echo requests
 TEST_F(RouterTest, AssignEcho) {
-    request_.body() = "Hello, world!"; 
+    request_.body() = "Hello, world!";
     request_.target("/echo");
     ASSERT_EQ(router_->assign_request(request_, response_), 1);
     for (const auto &field : request_) {
@@ -51,7 +53,7 @@ TEST_F(RouterTest, AssignEcho) {
         EXPECT_TRUE(response_.body().find(field.value().to_string()) != std::string::npos);
     }
     EXPECT_EQ(response_.result_int(), 200);
-    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
+    EXPECT_EQ(response_[http::field::content_type].to_string(), "text/plain");
     EXPECT_TRUE(response_.body().find("Hello, world!") != std::string::npos);
 }
 
@@ -60,12 +62,12 @@ TEST_F(RouterTest, AssignStatic) {
     request_.target("/static/index.html");
     ASSERT_EQ(router_->assign_request(request_, response_), 1);
     EXPECT_EQ(response_.result_int(), 200);
-    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/html");
+    EXPECT_EQ(response_[http::field::content_type].to_string(), "text/html");
 }
 
 // check if the router correctly assigns the handler for root "/"
 TEST_F(RouterTest, AssignRoot) {
-    request_.body() = "Hello, world!"; 
+    request_.body() = "Hello, world!";
     request_.target("/");
     ASSERT_EQ(router_->assign_request(request_, response_), 1);
     for (const auto &field : request_) {
@@ -73,13 +75,13 @@ TEST_F(RouterTest, AssignRoot) {
         EXPECT_TRUE(response_.body().find(field.value().to_string()) != std::string::npos);
     }
     EXPECT_EQ(response_.result_int(), 200);
-    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
+    EXPECT_EQ(response_[http::field::content_type].to_string(), "text/plain");
     EXPECT_TRUE(response_.body().find("Hello, world!") != std::string::npos);
 }
 
 // check if the router correctly assigns the handler for nested targets
 TEST_F(RouterTest, AssignNested) {
-    request_.body() = "Hello, world!"; 
+    request_.body() = "Hello, world!";
     request_.target("/nested/path");
     ASSERT_EQ(router_->assign_request(request_, response_), 1);
     for (const auto &field : request_) {
@@ -87,18 +89,18 @@ TEST_F(RouterTest, AssignNested) {
         EXPECT_TRUE(response_.body().find(field.value().to_string()) != std::string::npos);
     }
     EXPECT_EQ(response_.result_int(), 200);
-    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
+    EXPECT_EQ(response_[http::field::content_type].to_string(), "text/plain");
     EXPECT_TRUE(response_.body().find("Hello, world!") != std::string::npos);
 }
 
 // check if the router correctly assigns the http echo requests
 TEST_F(RouterTest, HandleBadRequest) {
     Router* router = Router::make_router(std::vector<RouterEntry> {entry1_});
-    request_.body() = "Hello, world!"; 
+    request_.body() = "Hello, world!";
     request_.target("/invalid/request/path");
     ASSERT_EQ(router->assign_request(request_, response_), 1);
 
     EXPECT_EQ(response_.result_int(), 400);
-    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
+    EXPECT_EQ(response_[http::field::content_type].to_string(), "text/plain");
     EXPECT_TRUE(response_.body() == "Invalid Request");
 }

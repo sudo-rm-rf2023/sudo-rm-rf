@@ -7,6 +7,8 @@
 #include "logger.h"
 #include "utils.h"
 
+namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+
 // Constructor
 StaticRequestHandler::StaticRequestHandler(const RequestHandler::Options& options){
     request_path_ = options.request_path;
@@ -16,7 +18,7 @@ StaticRequestHandler::StaticRequestHandler(const RequestHandler::Options& option
 
 // Factory Method
 StaticRequestHandler* StaticRequestHandler::makeStaticRequestHandler(const RequestHandler::Options& options){
-    if(options.base_dir.has_value()){ 
+    if (options.base_dir.has_value()) {
         return new StaticRequestHandler(options);
     } else { //invalid options: StaticRequestHandler requires a base_dir.
         return nullptr;
@@ -24,11 +26,11 @@ StaticRequestHandler* StaticRequestHandler::makeStaticRequestHandler(const Reque
 }
 
 int StaticRequestHandler::handle_request(
-    const boost::beast::http::request<boost::beast::http::string_body>& request,
-    boost::beast::http::response<boost::beast::http::string_body>& response) {
+    const http::request<http::string_body>& request,
+    http::response<http::string_body>& response) {
 
     response.version(request.version());
-    response.result(boost::beast::http::status::ok);
+    response.result(http::status::ok);
 
     // Build file path from request target
     int offset = request_path_.length();
@@ -43,8 +45,8 @@ int StaticRequestHandler::handle_request(
     // TODO: Check if file is a plain file (not a direcory, soft link, hard link etc).
     if (!file) {
         BOOST_LOG_TRIVIAL(info) << "File not found";
-        response.result(boost::beast::http::status::not_found);
-        response.set(boost::beast::http::field::content_type, "text/plain");
+        response.result(http::status::not_found);
+        response.set(http::field::content_type, "text/plain");
         response.body() = "File not found";
     } else {
         BOOST_LOG_TRIVIAL(info) << "File found";
@@ -55,8 +57,8 @@ int StaticRequestHandler::handle_request(
         response.content_length(response.body().size());
 
         // Set content type and status
-        response.set(boost::beast::http::field::content_type, mime_type(file_path));
-        response.result(boost::beast::http::status::ok);
+        response.set(http::field::content_type, mime_type(file_path));
+        response.result(http::status::ok);
     }
 
     // Prepare the response

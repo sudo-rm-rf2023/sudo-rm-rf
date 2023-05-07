@@ -8,6 +8,8 @@
 #include <sstream>
 #include <iostream>
 
+namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+
 Router* Router::make_router(std::vector<RouterEntry> router_entries) {
     BOOST_LOG_TRIVIAL(info) << "Setting up router..";
     Router* router = new Router();
@@ -51,12 +53,12 @@ int Router::register_handler(RouterEntry entry){
 
 
 int Router::assign_request(
-    const boost::beast::http::request<boost::beast::http::string_body>& request,
-    boost::beast::http::response<boost::beast::http::string_body>& response){
+    const http::request<http::string_body>& request,
+    http::response<http::string_body>& response){
 
     std::string target = request.target().to_string();
     RequestHandler* handler = route_handler(target);
-    
+
     if (handler){
         handler->handle_request(request, response);
     }
@@ -68,7 +70,7 @@ int Router::assign_request(
     return 1;
 }
 
-// takes in a string of request path and returns the ptr to the handler with longest 
+// takes in a string of request path and returns the ptr to the handler with longest
 // matching path. Returns nullptr if no matches are found
 RequestHandler* Router::route_handler(std::string request_path) {
     // if the request target is registered in handler_table_
@@ -90,9 +92,9 @@ RequestHandler* Router::route_handler(std::string request_path) {
     return route_handler(parentDir);
 }
 
-int Router::handle_bad_request(boost::beast::http::response<boost::beast::http::string_body>& response){
-    response.result(boost::beast::http::status::bad_request);
-    response.set(boost::beast::http::field::content_type, "text/plain");
+int Router::handle_bad_request(http::response<http::string_body>& response){
+    response.result(http::status::bad_request);
+    response.set(http::field::content_type, "text/plain");
     response.body() = "Invalid Request";
     response.prepare_payload();
     return 1;

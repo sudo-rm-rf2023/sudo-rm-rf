@@ -27,7 +27,7 @@ void logger_init() {
         logging::trivial::severity >= logging::trivial::info
     );
 
-    // This line adds common attributes such as TimeStamp and ThreadID to the log records. 
+    // This line adds common attributes such as TimeStamp and ThreadID to the log records.
     logging::add_common_attributes();
-    
+
 }

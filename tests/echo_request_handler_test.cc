@@ -6,7 +6,7 @@
 #include <string>
 
 // using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
-// namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
 class EchoRequestHandlerTest : public ::testing::Test {
 protected:
@@ -17,10 +17,9 @@ protected:
     ~EchoRequestHandlerTest(){
         delete handler_;
     }
-
     EchoRequestHandler* handler_;
-    boost::beast::http::request<boost::beast::http::string_body> request_;
-    boost::beast::http::response<boost::beast::http::string_body> response_;
+    http::request<http::string_body> request_;
+    http::response<http::string_body> response_;
 };
 
 TEST_F(EchoRequestHandlerTest, HelloWorld){
@@ -37,7 +36,7 @@ TEST_F(EchoRequestHandlerTest, HelloWorld){
         EXPECT_TRUE(response_.body().find(field.value().to_string()) != std::string::npos);
     }
     EXPECT_EQ(response_.result_int(), 200);
-    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
+    EXPECT_EQ(response_[http::field::content_type].to_string(), "text/plain");
     EXPECT_TRUE(response_.body().find("Hello, world!") != std::string::npos);
     EXPECT_TRUE(response_.body().find("POST /echoecho/123 HTTP/1.1") != std::string::npos);
 }
@@ -46,7 +45,7 @@ TEST_F(EchoRequestHandlerTest, FakeDelimiter){
     std::string test_str = "Fake header delimiter 1 \r\n\r\n Fake header delimiter 2 \n\n Hello World";
     request_ = {boost::beast::http::verb::post,
                 /*target=*/"/echoecho/123", /*version=*/11};
-    request_.body() = test_str; 
+    request_.body() = test_str;
     request_.prepare_payload();
 
     ASSERT_EQ(handler_->handle_request(request_, response_), 0);
@@ -56,6 +55,6 @@ TEST_F(EchoRequestHandlerTest, FakeDelimiter){
 TEST_F(EchoRequestHandlerTest, BadRequest){
     ASSERT_EQ(handler_->handle_bad_request(response_), 1);
     EXPECT_EQ(response_.result_int(), 400);
-    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
+    EXPECT_EQ(response_[http::field::content_type].to_string(), "text/plain");
     EXPECT_TRUE(response_.body() == "Invalid Request");
 }

@@ -4,6 +4,14 @@
 #include <string>
 #include <unordered_map>
 
+const std::string CONFIG_KW_SERVER = std::string("server");
+const std::string CONFIG_KW_LISTEN = std::string("listen");
+const std::string CONFIG_KW_LOCATION = std::string("location");
+const std::string CONFIG_KW_SERVETYPE = std::string("serveType");
+const std::string CONFIG_KW_BASEDIR = std::string("baseDir");
+const std::string CONFIG_KW_ECHO = std::string("echo");
+const std::string CONFIG_KW_STATIC = std::string("static");
+
 enum HandlerType {
     ECHO_HANDLER = 1,
     STATIC_HANDLER = 2,

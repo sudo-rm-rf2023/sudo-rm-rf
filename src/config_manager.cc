@@ -4,6 +4,7 @@
 #include <string>
 #include <boost/numeric/conversion/cast.hpp>
 #include "logger.h"
+#include "utils.h"
 
 bool StatementHasNTokens(const NginxConfigStatement& statement, uint32_t n){
   return statement.tokens_.size() == n;
@@ -45,7 +46,7 @@ ConfigManager* ConfigManager::makeConfigManager(const char *config_file) {
 // The location block must follow one of the following:
 //  1. Have serveType = echo with no baseDir statement;
 //  2. Have a baseDir statement;
-//  Having serveType = echo with a baseDir statement present is invalid. 
+//  Having serveType = echo with a baseDir statement present is invalid.
 //  Any Duplication is invalid.
 bool ConfigManager::ReadLocation(const std::string& request_path, const NginxConfig& location_block){
   if (request_path.empty()){

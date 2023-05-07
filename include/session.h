@@ -17,6 +17,7 @@
 #include "router.h"
 
 using boost::asio::ip::tcp;
+namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
 // TODO: Write a module dedicated to process received request and produce a response
 class session {
@@ -37,7 +38,7 @@ public:
 
 private:
   void read_request();
-  void write_response(const std::shared_ptr<boost::beast::http::response<boost::beast::http::string_body>>& response);
+  void write_response(const std::shared_ptr<http::response<http::string_body>>& response);
   void reset();
 
   tcp::socket socket_;

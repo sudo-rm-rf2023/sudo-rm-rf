@@ -7,7 +7,9 @@
 #include <string>
 #include "logger.h"
 
-std::string request_to_string(const boost::beast::http::request<boost::beast::http::string_body> &request) {
+namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+
+std::string request_to_string(const http::request<http::string_body> &request) {
     // Create a std::ostringstream to store the header
     std::ostringstream header_stream;
 
@@ -48,17 +50,17 @@ EchoRequestHandler* EchoRequestHandler::makeEchoRequestHandler(const RequestHand
 }
 
 int EchoRequestHandler::handle_request(
-    const boost::beast::http::request<boost::beast::http::string_body>& request, 
-    boost::beast::http::response<boost::beast::http::string_body>& response) {
-    
+    const http::request<http::string_body>& request,
+    http::response<http::string_body>& response) {
+
     BOOST_LOG_TRIVIAL(info) << "EchoRequestHandler::handle_request called";
     BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();
 
     response.version(request.version());
-    response.result(boost::beast::http::status::ok);
+    response.result(http::status::ok);
 
     response.body() = request_to_string(request);
-    response.set(boost::beast::http::field::content_type, "text/plain");
+    response.set(http::field::content_type, "text/plain");
     response.prepare_payload(); // set content-length
     printf("Response Generated.\n");
     return 0;

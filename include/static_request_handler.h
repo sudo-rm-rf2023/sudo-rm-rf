@@ -3,13 +3,15 @@
 
 #include "request_handler.h"
 
+namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+
 class StaticRequestHandler : public RequestHandler {
     public:
         static StaticRequestHandler* makeStaticRequestHandler(const RequestHandler::Options& options);
 
         int handle_request(
-        const boost::beast::http::request<boost::beast::http::string_body>& request,
-        boost::beast::http::response<boost::beast::http::string_body>& response) override;
+        const http::request<http::string_body>& request,
+        http::response<http::string_body>& response) override;
     private:
         StaticRequestHandler(const RequestHandler::Options& options);
         std::string request_path_;

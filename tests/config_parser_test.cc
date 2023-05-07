@@ -83,7 +83,7 @@ TEST(NginxConfigStatementTest, ToString) {
   statement.tokens_.push_back("bar");
 
   EXPECT_EQ("foo bar;\n", statement.ToString(0));
-} 
+}
 
 TEST(NginxConfigStatementTest, ToStringWithBlock) {
   NginxConfigStatement statement;
@@ -98,7 +98,7 @@ TEST(NginxConfigStatementTest, ToStringWithBlock) {
   statement.child_block_ = std::unique_ptr<NginxConfig>(child_config);
 
   EXPECT_EQ("server {\n  listen 8080;\n}\n", statement.ToString(0));
-} 
+}
 
 // NginxConfig::ToString() correctly prints out the config
 TEST(NginxConfigTest, ToStringWithBlock) {
@@ -107,11 +107,11 @@ TEST(NginxConfigTest, ToStringWithBlock) {
   NginxConfigStatement* statement1 = new NginxConfigStatement();
   statement1->tokens_.push_back("foo");
   statement1->tokens_.push_back("bar");
-  
+
   NginxConfigStatement* statement2 = new NginxConfigStatement();
   statement2->tokens_.push_back("server");
   statement2->child_block_ = std::make_unique<NginxConfig>();
-  
+
   statement2->child_block_.get()->statements_.emplace_back(new NginxConfigStatement);
   statement2->child_block_.get()->statements_.back().get()->tokens_.push_back("listen");
   statement2->child_block_.get()->statements_.back().get()->tokens_.push_back("8080");
