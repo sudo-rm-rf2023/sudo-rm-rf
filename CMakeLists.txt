@@ -79,7 +79,13 @@ target_link_libraries(server_test server_lib gtest_main)
 gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # integration test
-add_test(NAME integration_test COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/tests/integration.sh)
+file(GLOB_RECURSE DIR_INTEGRATION_TEST
+     LIST_DIRECTORIES true
+     CONFIGURE_DEPENDS
+     tests/integration_tests)
+file(COPY ${DIR_INTEGRATION_TEST} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}) # Copy the integration test directory to output dir
+
+add_test(NAME integration_test WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/integration_tests/ COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/integration_tests/integration.sh ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/server)
 
 # echo_request_handler test 
 add_executable(echo_request_handler_test tests/echo_request_handler_test.cc)

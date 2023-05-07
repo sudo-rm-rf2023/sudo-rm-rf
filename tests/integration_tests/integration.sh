@@ -1,4 +1,12 @@
 #!/bin/bash
+# Inputs:
+# integration.sh <path_to_server_binary>
+
+# Check that the first argument has to be the path to server binary
+if [ ! "$1" -f ]; then
+  echo -e "Usage: integration.sh <path_to_server_binary>. FAILED."
+  exit 1;
+fi
 
 # COLOR
 USE_COLOR=false
@@ -25,7 +33,8 @@ ENDCOLOR=$([ "$USE_COLOR" = "true" ] && echo "\e[0m" || echo "")
 
 # Configuration
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"  # Get the directory of this script
-TEST_CONFIG="${SCRIPT_DIR}/integration/test.conf"
+TEST_CONFIG="${SCRIPT_DIR}/test.conf"
+SERVER_BINARY="$1"
 TEST_PORT=8080
 
 echo -e "${BOLDBLUE}Script directory: ${SCRIPT_DIR}${ENDCOLOR}"
@@ -36,27 +45,15 @@ TOTAL_TESTS=0
 PASSED_TESTS=0
 FAILED_TESTS=0
 
-# Check for the existence of the executable in both locations
-if [ -f "${SCRIPT_DIR}/../build/bin/server" ]; then
-  COMMAND_NAME="${SCRIPT_DIR}/../build/bin/server"
-elif [ -f "${SCRIPT_DIR}/../build_coverage/bin/server" ]; then
-  COMMAND_NAME="${SCRIPT_DIR}/../build_coverage/bin/server"
-else
-  echo "${ITALICRED}Server executable not found in both build and build_coverage directories.${ENDCOLOR}"
-  exit 1
-fi
-
 echo -e "${BOLDBLUE}${COMMAND_NAME}${ENDCOLOR}"
-
 
 # Run the web server binary with the test config file in the background
 # Assume script is in the tests directory
-$COMMAND_NAME "$TEST_CONFIG" &
+$SERVER_BINARY "${TEST_CONFIG}" &
 SERVER_PID=$!
 
 # Give the server some time to start
 sleep 1
-
 
 # Execute each test script and collect results
 for TEST_SCRIPT in ${SCRIPT_DIR}/integration/*_test.sh; do
@@ -73,7 +70,6 @@ for TEST_SCRIPT in ${SCRIPT_DIR}/integration/*_test.sh; do
     echo -e "${ITALICRED}${RESULT}${ENDCOLOR}"
   fi
 done
-
 
 # Shut down the web server
 kill $SERVER_PID

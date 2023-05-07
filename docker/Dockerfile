@@ -9,8 +9,7 @@ WORKDIR /usr/src/projects/sudo-rm-rf/build
 # Build and test
 RUN cmake ..
 RUN make
-# TODO: Fix this
-RUN cp -r ../static ./static
+
 RUN ctest --output-on_failure
 
 

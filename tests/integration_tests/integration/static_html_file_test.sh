@@ -3,11 +3,11 @@
 
 SCRIPT_DIR="$1"
 TEST_PORT=$2
-EXPECTED_RESPONSE_FILE="${SCRIPT_DIR}/../../static/sudo-rm-rf-command.png"
-ACTUAL_RESPONSE_FILE="${SCRIPT_DIR}/actual_static_png_response.png"
+EXPECTED_RESPONSE_FILE="${SCRIPT_DIR}/../test_static_root/test_index.html"
+ACTUAL_RESPONSE_FILE="${SCRIPT_DIR}/actual_static_html_response.html"
 
 # Send a request to the web server to get the static file and save the output to ACTUAL_RESPONSE_FILE
-curl --output "$ACTUAL_RESPONSE_FILE" -s -S http://localhost:$TEST_PORT/static/sudo-rm-rf-command.png
+curl -o "$ACTUAL_RESPONSE_FILE" -s -S http://localhost:$TEST_PORT/static/test_index.html
 
 # Compare the received file (ACTUAL_RESPONSE_FILE) with the expected file (EXPECTED_RESPONSE_FILE)
 # -b option ignores line endings (Windows vs. Linux)
@@ -18,5 +18,7 @@ DIFF_EXIT_CODE=$?
 if [ $DIFF_EXIT_CODE -eq 0 ]; then
   echo "PASS"
 else
-  echo "static png file test FAIL"
+  echo "static html file test FAIL"
 fi
+
+

@@ -7,8 +7,17 @@ $ make coverage
 ```
 The report is in `build_coverage/report/index.html`
 
+# Run all tests (unittests + integration tests)
+```
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make && make test
+```
+
 # Run integration test script
 ```
-$ cd tests
-$ ./integration.sh -c
+$ cp build/bin/server tests/integration_tests
+$ cd tests/integration_tests
+$ ./integration.sh ./server -c
 ```

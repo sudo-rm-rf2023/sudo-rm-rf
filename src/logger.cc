@@ -5,7 +5,7 @@
 void logger_init() {
 
     logging::add_file_log(
-        keywords::file_name = "/var/log/SYSLOG_%Y%m%d_%N.log",
+        keywords::file_name = "./log/SYSLOG_%Y%m%d_%N.log",
         keywords::rotation_size = 10 * 1024 * 1024,
         keywords::time_based_rotation = sinks::file::rotation_at_time_point(0, 0, 0),
         keywords::format = "[%TimeStamp%]:[%ThreadID%]:[%Severity%]:%Message%",
@@ -18,7 +18,7 @@ void logger_init() {
     // Log to console
     logging::add_console_log(
         std::clog,
-        keywords::filter = logging::trivial::severity >= logging::trivial::warning,
+        keywords::filter = logging::trivial::severity >= logging::trivial::info,
         keywords::format = "[%TimeStamp%]:[%ThreadID%]:[%Severity%]:%Message%",
         keywords::auto_flush = true
     );
