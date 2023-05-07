@@ -3,9 +3,11 @@
 #include <sstream>
 #include <iostream>
 #include <unordered_map>
-
+#include  <boost/filesystem.hpp>
 #include "logger.h"
 #include "utils.h"
+
+namespace fs = boost::filesystem;
 
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
@@ -40,25 +42,38 @@ int StaticRequestHandler::handle_request(
     BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();
     BOOST_LOG_TRIVIAL(info) << "file_path: " << file_path;
 
-    // Check if file exists
-    std::ifstream file(file_path, std::ios::in | std::ios::binary);
-    // TODO: Check if file is a plain file (not a direcory, soft link, hard link etc).
-    if (!file) {
+    if (!fs::exists(file_path) || !fs::is_regular_file(file_path)) {
         BOOST_LOG_TRIVIAL(info) << "File not found";
         response.result(http::status::not_found);
         response.set(http::field::content_type, "text/plain");
         response.body() = "File not found";
     } else {
-        BOOST_LOG_TRIVIAL(info) << "File found";
-        // Read file content into response body
-        std::ostringstream content_stream;
-        content_stream << file.rdbuf();
-        response.body() = content_stream.str();
-        response.content_length(response.body().size());
+        // Security check - verify whether the file path is under the base directory
+        std::string base_canonical = fs::canonical(base_dir_).string();
+        std::string file_canonical = fs::canonical(file_path).string();
 
-        // Set content type and status
-        response.set(http::field::content_type, mime_type(file_path));
-        response.result(http::status::ok);
+        // Check if base_canonical is a prefix of file_canonical
+        if (file_canonical.find(base_canonical) != 0) {
+            BOOST_LOG_TRIVIAL(info) << "Permission denied";
+            response.result(http::status::forbidden);
+            response.set(http::field::content_type, "text/plain");
+            response.body() = "Permission denied";
+        }
+        else {
+            // File exists under base dir
+            std::ifstream file(file_path, std::ios::in | std::ios::binary);
+
+            BOOST_LOG_TRIVIAL(info) << "File found";
+            // Read file content into response body
+            std::ostringstream content_stream;
+            content_stream << file.rdbuf();
+            response.body() = content_stream.str();
+            response.content_length(response.body().size());
+
+            // Set content type and status
+            response.set(http::field::content_type, mime_type(file_path));
+            response.result(http::status::ok);
+        }
     }
 
     // Prepare the response

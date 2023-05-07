@@ -75,6 +75,20 @@ TEST_F(StaticRequestHandlerTest, NonExistingFile) {
     EXPECT_EQ(response_.body(), "File not found");
 }
 
+TEST_F(StaticRequestHandlerTest, FileOutsideBaseDir) {
+    RequestHandler::Options options = {/*request_path=*/"/data",
+                                        /*base_dir=*/"../static"};
+    handler_ = StaticRequestHandler::makeStaticRequestHandler(options);
+
+    request_ = {boost::beast::http::verb::get,
+                /*target=*/"/data/../tests/static_file_outside_base.txt", /*version=*/11};
+
+    ASSERT_EQ(handler_->handle_request(request_, response_), 0);
+    EXPECT_EQ(response_.result_int(), 403);
+    EXPECT_EQ(response_[boost::beast::http::field::content_type].to_string(), "text/plain");
+    EXPECT_EQ(response_.body(), "Permission denied");
+}
+
 TEST_F(StaticRequestHandlerTest, ContentType) {
     RequestHandler::Options options = {/*request_path=*/"/www/images",
                                         /*base_dir=*/"../static"};
