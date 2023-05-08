@@ -1,12 +1,6 @@
 #!/bin/bash
 # Inputs:
-# integration.sh <path_to_server_binary>
-
-# Check that the first argument has to be the path to server binary
-if [ ! "$1" -f ]; then
-  echo -e "Usage: integration.sh <path_to_server_binary>. FAILED."
-  exit 1;
-fi
+# integration.sh [-c color] <path_to_server_binary>
 
 # COLOR
 USE_COLOR=false
@@ -18,6 +12,13 @@ do
     shift  # Remove the "color" argument from the list
   fi
 done
+
+# Check that the first argument has to be the path to server binary
+if [ ! -f "$1" ]; then
+  echo -e "ERROR: First argument is ${1}"
+  echo -e "Usage: integration.sh [-c] <path_to_server_binary>. FAILED."
+  exit 1;
+fi
 
 RED="31"
 GREEN="32"
@@ -39,6 +40,7 @@ TEST_PORT=8080
 
 echo -e "${BOLDBLUE}Script directory: ${SCRIPT_DIR}${ENDCOLOR}"
 echo -e "${BOLDBLUE}Config: ${TEST_CONFIG}${ENDCOLOR}"
+echo -e "${BOLDBLUE}Server binary: ${SERVER_BINARY}${ENDCOLOR}"
 
 # Initialize variables for test results
 TOTAL_TESTS=0
@@ -46,6 +48,14 @@ PASSED_TESTS=0
 FAILED_TESTS=0
 
 echo -e "${BOLDBLUE}${COMMAND_NAME}${ENDCOLOR}"
+
+
+check_server_running() {
+  if ! ps -p $SERVER_PID > /dev/null; then
+    echo "Web server is not running. Exiting..."
+    exit 1
+  fi
+}
 
 # Run the web server binary with the test config file in the background
 # Assume script is in the tests directory
@@ -58,6 +68,9 @@ sleep 1
 # Execute each test script and collect results
 for TEST_SCRIPT in ${SCRIPT_DIR}/integration/*_test.sh; do
   ((TOTAL_TESTS++))
+  # Check if the web server is running before executing the test
+  check_server_running
+
   echo -e "${BOLDYELLOW}Running test $TEST_SCRIPT${ENDCOLOR}"
   RESULT=$(bash "$TEST_SCRIPT" "${SCRIPT_DIR}/integration" $TEST_PORT)
   # echo -e "${BOLDBLUE}Result: $RESULT${ENDCOLOR}"
