@@ -19,5 +19,10 @@ $ make && make test
 ```
 $ cp build/bin/server tests/integration_tests
 $ cd tests/integration_tests
-$ ./integration.sh ./server -c
+$ ./integration.sh -c ./server
+```
+Or
+```
+$ cd build/bin
+$ ./integration.sh -c ./server
 ```
