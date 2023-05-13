@@ -8,7 +8,7 @@
 #include <optional>
 #include <memory>
 
-namespace config_util{
+namespace config_util {
 
 std::optional<std::vector<DispatcherEntry>>  getDispatcherEntriesFromConfig(const NginxConfig& config);
 

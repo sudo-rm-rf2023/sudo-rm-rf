@@ -6,12 +6,16 @@
 #include "logger.h"
 #include "utils.h"
 
+namespace {
+
 bool StatementHasNTokens(const NginxConfigStatement& statement, uint32_t n){
   return statement.tokens_.size() == n;
 }
 
 bool StatementHasChildBlock(const NginxConfigStatement& statement){
   return statement.child_block_ != nullptr;
+}
+
 }
 
 ConfigManager* ConfigManager::makeConfigManager(const char *config_file) {

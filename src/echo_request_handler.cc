@@ -1,13 +1,19 @@
 #include "echo_request_handler.h"
+#include "config_parser.h"
 #include <boost/beast/http/verb.hpp>
 #include <sstream>
 
+#include "logger.h"
 #include <boost/beast.hpp>
 #include <sstream>
 #include <string>
-#include "logger.h"
 
-namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+namespace http = boost::beast::http; // from <boost/beast/http.hpp>
+
+// Constructor
+EchoRequestHandler::EchoRequestHandler(const std::string &location, const NginxConfig &config_block) {
+    request_path_ = location;
+}
 
 std::string request_to_string(const http::request<http::string_body> &request) {
     // Create a std::ostringstream to store the header
@@ -26,7 +32,7 @@ std::string request_to_string(const http::request<http::string_body> &request) {
     header_stream << ".";
     header_stream << minor_version;
     header_stream << "\r\n";
-    for (const auto& field : request) {
+    for (const auto &field : request) {
         header_stream << field.name_string() << ": " << field.value() << "\r\n";
     }
     header_stream << "\r\n";
@@ -41,17 +47,17 @@ std::string request_to_string(const http::request<http::string_body> &request) {
     return full_request_str;
 }
 
-EchoRequestHandler::EchoRequestHandler(const RequestHandler::Options& options){
+EchoRequestHandler::EchoRequestHandler(const RequestHandler::Options &options) {
     request_path_ = options.request_path;
 }
 
-EchoRequestHandler* EchoRequestHandler::makeEchoRequestHandler(const RequestHandler::Options& options){
+EchoRequestHandler *EchoRequestHandler::makeEchoRequestHandler(const RequestHandler::Options &options) {
     return new EchoRequestHandler(options);
 }
 
 int EchoRequestHandler::handle_request(
-    const http::request<http::string_body>& request,
-    http::response<http::string_body>& response) {
+    const http::request<http::string_body> &request,
+    http::response<http::string_body> &response) {
 
     BOOST_LOG_TRIVIAL(info) << "EchoRequestHandler::handle_request called";
     BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();

@@ -2,11 +2,16 @@
 #define STATIC_REQUEST_HANDLER_H
 
 #include "request_handler.h"
+#include "config_parser.h"
+#include "request_handler_factory.h"
+#include <optional>
+#include <string>
 
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
 class StaticRequestHandler : public RequestHandler {
     public:
+        StaticRequestHandler(const std::string& location, const NginxConfig& config_block);
         static StaticRequestHandler* makeStaticRequestHandler(const RequestHandler::Options& options);
 
         int handle_request(
@@ -15,7 +20,17 @@ class StaticRequestHandler : public RequestHandler {
     private:
         StaticRequestHandler(const RequestHandler::Options& options);
         std::string request_path_;
-        std::string base_dir_;
+        std::optional<std::string> base_dir_ = std::nullopt;
+};
+
+// Factory
+class StaticHandlerFactory : public RequestHandlerFactory {
+public:
+    StaticHandlerFactory(const std::string &location, const NginxConfig &config_block)
+        : RequestHandlerFactory(location, config_block) {}
+    std::shared_ptr<StaticRequestHandler> create() {
+        return std::make_shared<StaticRequestHandler>(location_, config_block_);
+    }
 };
 
 #endif

@@ -14,6 +14,7 @@ const std::string CONFIG_KW_SERVETYPE = std::string("serveType");
 const std::string CONFIG_KW_BASEDIR = std::string("baseDir");
 const std::string CONFIG_KW_ECHO = std::string("echo");
 const std::string CONFIG_KW_STATIC = std::string("static");
+const std::string CONFIG_KW_ROOT = std::string("root");
 
 
 enum HandlerType {
