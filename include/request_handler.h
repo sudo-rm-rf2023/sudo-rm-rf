@@ -1,37 +1,36 @@
 #ifndef REQUEST_HANDLER_H
 #define REQUEST_HANDLER_H
 
-#include <cstdlib>
-#include <string>
-#include <boost/beast/http/message.hpp>
-#include <boost/beast/http/string_body.hpp>
-#include <boost/beast/http/status.hpp>
-#include <optional>
-
 #include "utils.h"
+#include <boost/beast/http/message.hpp>
+#include <boost/beast/http/status.hpp>
+#include <boost/beast/http/string_body.hpp>
+#include <cstdlib>
+#include <optional>
+#include <string>
 
-namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+namespace http = boost::beast::http; // from <boost/beast/http.hpp>
 
 class RequestHandler {
-    public:
-        struct Options{ // A parameter object for the RequestHandler constructors.
-            std::string request_path;
-            std::optional<std::string> base_dir;
-        };
+public:
+    struct Options { // A parameter object for the RequestHandler constructors.
+        std::string request_path;
+        std::optional<std::string> base_dir;
+    };
 
-        // A non-zero return value indicates error.
-        // Input: request. Output: response.
-        virtual int handle_request(
-        const http::request<http::string_body>& request,
-        http::response<http::string_body>& response) = 0;
+    // A non-zero return value indicates error.
+    // Input: request. Output: response.
+    virtual int handle_request(
+        const http::request<http::string_body> &request,
+        http::response<http::string_body> &response) = 0;
 
-        int handle_bad_request(http::response<http::string_body>& response){
-            response.result(http::status::bad_request);
-            response.set(http::field::content_type, "text/plain");
-            response.body() = "Invalid Request";
-            response.prepare_payload();
-            return 1;
-        }
+    int handle_bad_request(http::response<http::string_body> &response) {
+        response.result(http::status::bad_request);
+        response.set(http::field::content_type, "text/plain");
+        response.body() = "Invalid Request";
+        response.prepare_payload();
+        return 1;
+    }
 };
 
 #endif

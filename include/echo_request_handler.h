@@ -27,7 +27,7 @@ class EchoHandlerFactory : public RequestHandlerFactory {
 public:
     EchoHandlerFactory(const std::string &location, const NginxConfig &config_block)
         : RequestHandlerFactory(location, config_block) {}
-    std::shared_ptr<EchoRequestHandler> create() {
+    std::shared_ptr<RequestHandler> create() {
         return std::make_shared<EchoRequestHandler>(location_, config_block_);
     }
 };

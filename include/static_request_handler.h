@@ -28,7 +28,7 @@ class StaticHandlerFactory : public RequestHandlerFactory {
 public:
     StaticHandlerFactory(const std::string &location, const NginxConfig &config_block)
         : RequestHandlerFactory(location, config_block) {}
-    std::shared_ptr<StaticRequestHandler> create() {
+    std::shared_ptr<RequestHandler> create() {
         return std::make_shared<StaticRequestHandler>(location_, config_block_);
     }
 };
