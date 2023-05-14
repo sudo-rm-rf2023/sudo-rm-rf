@@ -47,12 +47,14 @@ add_library(static_handler_lib src/static_request_handler.cc)
 add_library(router_lib src/router.cc)
 add_library(util_lib src/util.cc)
 add_library(config_utils_lib src/config_utils.cc)
+add_library(dispatcher_lib src/dispatcher.cc)
 
 target_link_libraries(config_manager_lib config_parser_lib config_utils_lib)
 target_link_libraries(server_lib config_manager_lib session_lib logger_lib)
 target_link_libraries(session_lib echo_handler_lib static_handler_lib router_lib)
 target_link_libraries(router_lib echo_handler_lib static_handler_lib)
 target_link_libraries(config_utils_lib config_parser_lib util_lib logger_lib)
+target_link_libraries(dispatcher_lib config_utils_lib util_lib logger_lib static_handler_lib echo_handler_lib)
 
 # Link Boost libraries
 target_link_libraries(logger_lib Boost::log Boost::log_setup Boost::system)

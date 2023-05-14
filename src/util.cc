@@ -31,3 +31,4 @@ std::string mime_type(const std::string& path) {
     // Default MIME type if the file extension is not found or unknown
     return "application/octet-stream";
 }
+
