@@ -10,6 +10,8 @@
 
 namespace config_util {
 
+bool validateConfig(const NginxConfig &config);
+
 std::optional<std::vector<DispatcherEntry>> getDispatcherEntriesFromConfig(const NginxConfig &config);
 
 std::optional<int> getPortFromConfig(const NginxConfig &config);

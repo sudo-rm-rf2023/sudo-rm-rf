@@ -20,17 +20,20 @@ class ConfigUtilsTest : public ::testing::Test {
 
 TEST_F(ConfigUtilsTest, GetPort){
     ASSERT_TRUE(ParseFile("./test_configs/new_configs/simple_port.conf"));
+    EXPECT_TRUE(config_util::validateConfig(config));
     EXPECT_EQ(config_util::getPortFromConfig(config).value(), 9090);
 }
 
 TEST_F(ConfigUtilsTest, GetPortInvalid){
     ASSERT_TRUE(ParseFile("./test_configs/new_configs/simple_port_invalid.conf"));
+    EXPECT_FALSE(config_util::validateConfig(config));
     EXPECT_EQ(config_util::getPortFromConfig(config), std::nullopt);
 }
 
 TEST_F(ConfigUtilsTest, GetPortWithNoListenStatement){
     ASSERT_TRUE(ParseFile("./test_configs/new_configs/no_listen_statement.conf"));
     EXPECT_EQ(config_util::getPortFromConfig(config), std::nullopt);
+    EXPECT_FALSE(config_util::validateConfig(config));
 }
 
 TEST_F(ConfigUtilsTest, GetBaseDir){
@@ -43,6 +46,16 @@ TEST_F(ConfigUtilsTest, GetBaseDirInvalid){
     EXPECT_EQ(config_util::getBaseDirFromLocationConfig(config), std::nullopt);
 }
 
+TEST_F(ConfigUtilsTest, ConfigWithInvalidStaticLocationBlock){
+    ASSERT_TRUE(ParseFile("./test_configs/new_configs/invalid_static_location_block.conf"));
+    EXPECT_FALSE(config_util::validateConfig(config));
+}
+
+TEST_F(ConfigUtilsTest, ConfigWithInvalidLocationStatement){
+    ASSERT_TRUE(ParseFile("./test_configs/new_configs/invalid_location_statement.conf"));
+    EXPECT_FALSE(config_util::validateConfig(config));
+}
+
 
 using ::testing::SizeIs;
 using ::testing::ElementsAre;
@@ -53,6 +66,8 @@ TEST_F(ConfigUtilsTest, GetDispatcherEntries){
     ASSERT_TRUE(ParseFile("./test_configs/new_configs/valid_config.conf"));
     ASSERT_EQ(config_util::getPortFromConfig(config).value(), 8080);
     ASSERT_NE(config_util::getDispatcherEntriesFromConfig(config), std::nullopt);
+    ASSERT_TRUE(config_util::validateConfig(config));
+
     std::vector<DispatcherEntry> entries = config_util::getDispatcherEntriesFromConfig(config).value();
 
     EXPECT_THAT(entries, SizeIs(4));
@@ -80,6 +95,8 @@ TEST_F(ConfigUtilsTest, EmptyDispatcherEntries){
     ASSERT_TRUE(ParseFile("./test_configs/new_configs/simple_port.conf"));
     ASSERT_EQ(config_util::getPortFromConfig(config).value(), 9090);
     ASSERT_NE(config_util::getDispatcherEntriesFromConfig(config), std::nullopt);
+    EXPECT_TRUE(config_util::validateConfig(config));
+
     std::vector<DispatcherEntry> entries = config_util::getDispatcherEntriesFromConfig(config).value();
     EXPECT_THAT(entries, SizeIs(0));
 }
@@ -87,6 +104,7 @@ TEST_F(ConfigUtilsTest, EmptyDispatcherEntries){
 TEST_F(ConfigUtilsTest, GetDispatcherEntriesInvalid){
     ASSERT_TRUE(ParseFile("./test_configs/new_configs/invalid_config_unknown_handler.conf"));
     EXPECT_EQ(config_util::getDispatcherEntriesFromConfig(config), std::nullopt);
+    EXPECT_FALSE(config_util::validateConfig(config));
 }
 
 

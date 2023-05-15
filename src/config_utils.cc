@@ -2,7 +2,7 @@
 #include "logger.h"
 #include <boost/numeric/conversion/cast.hpp>
 
-// Helper Functions
+namespace {// Helper Functions
 bool StatementHasNTokens(const NginxConfigStatement &statement, uint32_t n) {
     return statement.tokens_.size() == n;
 }
@@ -34,6 +34,24 @@ HandlerType GetHandlerTypeFromToken(std::string type_token) {
         return HandlerType::UNDEFINED_HANDLER;
     }
 }
+
+bool ValidateLocationBlock(NginxConfig location_config, HandlerType type){
+    switch (type) {
+    case UNDEFINED_HANDLER:
+        return false;
+        break;
+    case STATIC_HANDLER:
+        if(!config_util::getBaseDirFromLocationConfig(location_config).has_value()){
+            return false;
+        }
+        break;
+    default:
+        break;
+    }
+    return true;
+}
+
+} // namespace
 
 namespace config_util {
 
@@ -79,6 +97,25 @@ std::optional<std::string> getBaseDirFromLocationConfig(const NginxConfig &locat
         }
     }
     return std::nullopt;
+}
+
+bool validateConfig(const NginxConfig &config){
+    if(!getPortFromConfig(config).has_value()){ // Must have port statement
+        return false;
+    }
+
+    for (std::shared_ptr<NginxConfigStatement> statement : config.statements_){ // Check all location statements
+        if (GetFirstTokenOfStatement(*statement) == "location"){
+            HandlerType handler_type = GetHandlerTypeFromToken(GetNthTokenOfStatement(*statement, 3).value_or("Undefined"));
+            if (!StatementHasNTokens(*statement, 3) ||
+                !StatementHasChildBlock(*statement) ||
+                !ValidateLocationBlock(*(statement->child_block_.get()), handler_type)){
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 } // namespace config_util
