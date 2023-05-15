@@ -16,6 +16,7 @@ const std::string CONFIG_KW_ECHO = std::string("echo");
 const std::string CONFIG_KW_STATIC = std::string("static");
 const std::string CONFIG_KW_ROOT = std::string("root");
 
+typedef bool status;
 
 enum HandlerType {
     UNDEFINED_HANDLER = 0,

@@ -13,7 +13,7 @@ public:
     EchoRequestHandler(const std::string &location, const NginxConfig &config_block);
     static EchoRequestHandler *makeEchoRequestHandler(const RequestHandler::Options &options);
 
-    int handle_request(
+    status handle_request(
         const http::request<http::string_body> &request,
         http::response<http::string_body> &response) override;
 

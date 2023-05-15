@@ -55,7 +55,7 @@ EchoRequestHandler *EchoRequestHandler::makeEchoRequestHandler(const RequestHand
     return new EchoRequestHandler(options);
 }
 
-int EchoRequestHandler::handle_request(
+status EchoRequestHandler::handle_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
 
@@ -69,5 +69,5 @@ int EchoRequestHandler::handle_request(
     response.set(http::field::content_type, "text/plain");
     response.prepare_payload(); // set content-length
     printf("Response Generated.\n");
-    return 0;
+    return true;
 }

@@ -33,7 +33,7 @@ RequestHandlerFactory* Dispatcher::match(const std::string& request_url){
     return match(parentUrl);
 }
 
-int Dispatcher::assign_request(const http::request<http::string_body>& request,
+status Dispatcher::assign_request(const http::request<http::string_body>& request,
     http::response<http::string_body>& response){
 
     std::string request_url = request.target().to_string();

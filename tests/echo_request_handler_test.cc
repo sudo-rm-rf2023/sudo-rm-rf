@@ -29,7 +29,7 @@ TEST_F(EchoRequestHandlerTest, HelloWorld){
     ASSERT_EQ(request_.method_string(), std::string("POST"));
     ASSERT_EQ(request_.target(), std::string("/echoecho/123"));
 
-    ASSERT_EQ(handler_->handle_request(request_, response_), 0);
+    ASSERT_EQ(handler_->handle_request(request_, response_), true);
     for (const auto &field : request_) {
         EXPECT_TRUE(response_.body().find(field.name_string().to_string()) != std::string::npos);
         EXPECT_TRUE(response_.body().find(field.value().to_string()) != std::string::npos);
@@ -47,12 +47,12 @@ TEST_F(EchoRequestHandlerTest, FakeDelimiter){
     request_.body() = test_str;
     request_.prepare_payload();
 
-    ASSERT_EQ(handler_->handle_request(request_, response_), 0);
+    ASSERT_EQ(handler_->handle_request(request_, response_), true);
     EXPECT_TRUE(response_.body().find(test_str) != std::string::npos);
 }
 
 TEST_F(EchoRequestHandlerTest, BadRequest){
-    ASSERT_EQ(handler_->handle_bad_request(response_), 1);
+    ASSERT_EQ(handler_->handle_bad_request(response_), false);
     EXPECT_EQ(response_.result_int(), 400);
     EXPECT_EQ(response_[http::field::content_type].to_string(), "text/plain");
     EXPECT_TRUE(response_.body() == "Invalid Request");

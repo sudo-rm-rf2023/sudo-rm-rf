@@ -35,7 +35,7 @@ StaticRequestHandler *StaticRequestHandler::makeStaticRequestHandler(const Reque
     }
 }
 
-int StaticRequestHandler::handle_request(
+status StaticRequestHandler::handle_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
 
@@ -86,5 +86,5 @@ int StaticRequestHandler::handle_request(
     // Prepare the response
     response.prepare_payload();
 
-    return 0; // Return 0 to indicate success
+    return true; // Return 0 to indicate success
 }

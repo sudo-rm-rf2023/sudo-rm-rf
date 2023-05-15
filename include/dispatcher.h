@@ -17,7 +17,7 @@ namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 class Dispatcher {
     public:
         Dispatcher(const std::unordered_map<std::string, RequestHandlerFactory*>& routes) {routes_ = routes;}
-        int assign_request(
+        status assign_request(
             const http::request<http::string_body> &request,
             http::response<http::string_body> &response);
 

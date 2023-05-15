@@ -20,16 +20,16 @@ public:
 
     // A non-zero return value indicates error.
     // Input: request. Output: response.
-    virtual int handle_request(
+    virtual status handle_request(
         const http::request<http::string_body> &request,
         http::response<http::string_body> &response) = 0;
 
-    int handle_bad_request(http::response<http::string_body> &response) {
+    status handle_bad_request(http::response<http::string_body> &response) {
         response.result(http::status::bad_request);
         response.set(http::field::content_type, "text/plain");
         response.body() = "Invalid Request";
         response.prepare_payload();
-        return 1;
+        return false;
     }
 };
 
