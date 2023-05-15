@@ -22,7 +22,7 @@ class Dispatcher {
             http::response<http::string_body> &response);
 
     private:
-        static std::unordered_map<std::string, RequestHandlerFactory*> routes_;
+        std::unordered_map<std::string, RequestHandlerFactory*> routes_;
         RequestHandlerFactory* match(const std::string& request_url);
 };
 

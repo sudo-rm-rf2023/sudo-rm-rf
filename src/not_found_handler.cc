@@ -6,7 +6,7 @@
 
 namespace http = boost::beast::http; // from <boost/beast/http.hpp>
 
-int NotFoundHandler::handle_request(
+status NotFoundHandler::handle_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
 
@@ -17,5 +17,5 @@ int NotFoundHandler::handle_request(
     response.set(http::field::content_type, "text/plain");
     response.body() = "Not Found";
     response.prepare_payload();
-    return 0;
+    return true;
 }

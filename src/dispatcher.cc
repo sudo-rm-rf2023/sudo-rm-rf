@@ -13,6 +13,7 @@ RequestHandlerFactory* create_handler_factory(DispatcherEntry entry){
     if (entry.handler_type == STATIC_HANDLER){
         return new StaticHandlerFactory(entry.location, entry.location_config);
     }
+    return nullptr;
 }
 
 // search if url is registered to a handler, else recersively search

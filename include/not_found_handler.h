@@ -12,7 +12,7 @@ class NotFoundHandler : public RequestHandler {
 public:
     NotFoundHandler(const std::string &location, const NginxConfig &config_block) {}
 
-    int handle_request(
+    status handle_request(
         const http::request<http::string_body> &request,
         http::response<http::string_body> &response) override;
 };

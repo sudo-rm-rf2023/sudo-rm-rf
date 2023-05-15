@@ -86,6 +86,11 @@ add_executable(server_test tests/server_test.cc)
 target_link_libraries(server_test server_lib gtest_main)
 gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# dispatcher test
+add_executable(dispatcher_test tests/dispatcher_test.cc)
+target_link_libraries(dispatcher_test dispatcher_lib gtest_main gmock)
+gtest_discover_tests(dispatcher_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
 # integration test
 file(GLOB_RECURSE DIR_INTEGRATION_TEST
      LIST_DIRECTORIES true
@@ -129,7 +134,9 @@ gtest_discover_tests(config_utils_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
-        server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib static_handler_lib not_found_handler_lib router_lib config_utils_lib
+        server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib 
+        static_handler_lib not_found_handler_lib router_lib config_utils_lib dispatcher_lib
     TESTS 
-        config_parser_test config_manager_test server_test session_test echo_request_handler_test static_request_handler_test not_found_handler_test router_test config_utils_test)
+        config_parser_test config_manager_test server_test session_test echo_request_handler_test 
+        static_request_handler_test not_found_handler_test router_test config_utils_test dispatcher_test)
 
