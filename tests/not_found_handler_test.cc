@@ -1,6 +1,7 @@
 #include "not_found_handler.h"
 #include "request_handler.h"
 #include "gtest/gtest.h"
+#include "config_parser.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -10,14 +11,12 @@ namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 class NotFoundHandlerTest : public ::testing::Test {
 protected:
     NotFoundHandlerTest() {
-        config_ = new NginxConfig;
-        handler_ = new NotFoundHandler("/", *config_);
+        NginxConfig config;
+        NotFoundHandlerFactory factory("/", config);
+        handler_ = factory.create();
     }
-    ~NotFoundHandlerTest(){
-        delete handler_;
-    }
-    NotFoundHandler* handler_;
-    NginxConfig* config_;
+
+    std::shared_ptr<RequestHandler> handler_;
     http::request<http::string_body> request_;
     http::response<http::string_body> response_;
 };

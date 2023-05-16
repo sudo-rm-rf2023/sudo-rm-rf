@@ -1,6 +1,7 @@
 #include "echo_request_handler.h"
 #include "request_handler.h"
 #include "gtest/gtest.h"
+#include "config_parser.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -10,13 +11,12 @@ namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 class EchoRequestHandlerTest : public ::testing::Test {
 protected:
     EchoRequestHandlerTest() {
-        RequestHandler::Options options = {/*request_path=*/"/echoecho"};
-        handler_ = EchoRequestHandler::makeEchoRequestHandler(options);
+        NginxConfig config;
+        EchoHandlerFactory factory("/echoecho", config);
+        handler_ = factory.create();
     }
-    ~EchoRequestHandlerTest(){
-        delete handler_;
-    }
-    EchoRequestHandler* handler_;
+
+    std::shared_ptr<RequestHandler> handler_;
     http::request<http::string_body> request_;
     http::response<http::string_body> response_;
 };

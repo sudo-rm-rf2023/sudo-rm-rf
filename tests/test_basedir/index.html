@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>sudo rm -rf</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #F5F5F5;
+                color: #333;
+                text-align: center;
+                padding: 30px;
+            }
+
+            .command-block {
+                background-color: #EEE;
+                border: 1px solid #CCC;
+                padding: 15px;
+                border-radius: 8px;
+                margin: 20px auto;
+                width: 50%;
+            }
+
+            button {
+                background-color: #007BFF;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 1em;
+                margin-top: 20px;
+            }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+        </style>
+    </head>
+    <body id="body">
+        <h1>Understanding the power of 'sudo rm -rf'</h1>
+        <div class="command-block" id="warningBlock">
+            <p>
+                <b>Warning:</b> 
+                'sudo rm -rf' is a very powerful command in Unix-based systems. 
+                When executed, it recursively removes all files and directories from the specified directory. 
+                If used improperly, it can lead to irreversible loss of data. 
+                Always be cautious when using this command!
+            </p>
+        </div>
+
+        <div class="command-block">
+            <h2>What does 'sudo rm -rf' mean?</h2>
+            <p><b>sudo:</b> Superuser do. Allows regular users to execute commands as the root user.</p>
+            <p><b>rm:</b> Remove. Deletes files or directories.</p>
+            <p><b>-r:</b> Recursive. When used with a directory, it removes the directory and its contents recursively.</p>
+            <p><b>-f:</b> Force. Ignores nonexistent files and arguments, and never prompts before removal.</p>
+        </div>
+
+        <div class="command-block">
+            <h2>Safety tips</h2>
+            <ul>
+                <li>Never use 'sudo rm -rf' unless you're absolutely sure you know what you're doing.</li>
+                <li>Always double-check the directory you're about to delete.</li>
+                <li>Never run 'sudo rm -rf /' unless you want to delete everything on your system!</li>
+            </ul>
+        </div>
+
+        <button onclick="removeBlock()">Simulate 'sudo rm -rf'</button>
+        <button onclick="removeAll()">Simulate 'sudo rm -rf /'</button>
+
+        <script>
+            function removeBlock() {
+                document.getElementById("warningBlock").style.display = "none";
+            }
+
+            function removeAll() {
+                document.getElementById("body").innerHTML = "";
+            }
+        </script>
+    </body>
+</html>

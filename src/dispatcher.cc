@@ -4,7 +4,7 @@
 #include "echo_request_handler.h"
 #include "static_request_handler.h"
 
-// TODO: 
+// TODO:
 // Add error handling for undefined handler types
 RequestHandlerFactory* create_handler_factory(DispatcherEntry entry){
     if (entry.handler_type == ECHO_HANDLER){
