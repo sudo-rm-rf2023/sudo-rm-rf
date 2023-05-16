@@ -3,6 +3,8 @@
 #include "config_utils.h"
 #include "echo_request_handler.h"
 #include "static_request_handler.h"
+#include "not_found_handler.h"
+#include "logger.h"
 
 // TODO:
 // Add error handling for undefined handler types
@@ -12,6 +14,9 @@ RequestHandlerFactory* create_handler_factory(DispatcherEntry entry){
     }
     if (entry.handler_type == STATIC_HANDLER){
         return new StaticHandlerFactory(entry.location, entry.location_config);
+    }
+    if (entry.handler_type == NOTFOUND_HANDLER){
+        return new NotFoundHandlerFactory(entry.location, entry.location_config);
     }
     return nullptr;
 }
@@ -43,13 +48,28 @@ status Dispatcher::assign_request(const http::request<http::string_body>& reques
     return handler->handle_request(request, response);
 }
 
-std::unordered_map<std::string, RequestHandlerFactory*> map_config_to_handler_factory(const NginxConfig &config){
-    std::unordered_map<std::string, RequestHandlerFactory*> routes;
+ bool map_config_to_handler_factory(const NginxConfig &config, std::unordered_map<std::string, RequestHandlerFactory*> &routes){
+    // std::unordered_map<std::string, RequestHandlerFactory*> routes;
     std::optional<std::vector<DispatcherEntry>> dispatcher_entries = config_util::getDispatcherEntriesFromConfig(config);
     if (dispatcher_entries){
         for (DispatcherEntry entry : *dispatcher_entries){
-            routes[entry.location] = create_handler_factory(entry);
+            RequestHandlerFactory*  factory = create_handler_factory(entry);
+            if (factory){
+                routes[entry.location] =factory;
+            }
+            else {
+                BOOST_LOG_TRIVIAL(error) << "invalid handler config for location" << entry.location;
+                return false;
+            }
         }
     }
-    return routes;
+    // return routes;
+    return true;
+}
+
+void Dispatcher::handle_bad_request(http::response<http::string_body>& response){
+    response.result(http::status::bad_request);
+    response.set(http::field::content_type, "text/plain");
+    response.body() = "Invalid Request";
+    response.prepare_payload();
 }

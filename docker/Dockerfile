@@ -32,4 +32,4 @@ ENTRYPOINT ["./server"]
 
 # Use CMD to specify arguments to ENTRYPOINT
 # Update with real server args
-CMD ["assign5.conf"]
+CMD ["assign6.conf"]

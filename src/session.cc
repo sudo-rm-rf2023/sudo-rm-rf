@@ -32,7 +32,7 @@ void session::read_request() {
         // Create a shared pointer to the response object (lifetime managed by the session)
         std::shared_ptr<http::response<http::string_body>> response = std::make_shared<http::response<http::string_body>>();
         // generate error message if failed to generate response
-        if(!router_->assign_request(*request, *response)){
+        if(!dispatcher_->assign_request(*request, *response)){
           BOOST_LOG_TRIVIAL(error) << "Failed to generate response.";
           http::status status = http::status::internal_server_error;
           response->result(status);
@@ -44,7 +44,7 @@ void session::read_request() {
           BOOST_LOG_TRIVIAL(error) << "Bad request";
           // Send a 400 Bad Request response
           std::shared_ptr<http::response<http::string_body>> response = std::make_shared<http::response<http::string_body>>();
-          router_->handle_bad_request(*response);
+          dispatcher_->handle_bad_request(*response);
           http::write(socket_, *response); //TODO: refactor session class
         } else {
           fprintf(stderr, "Error in async_read (I/O): %s\n", ec.message().c_str());

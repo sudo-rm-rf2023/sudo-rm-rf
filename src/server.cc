@@ -10,20 +10,19 @@
 
 #include "server.h"
 #include "logger.h"
+#include "config_utils.h"
 
-server::server(boost::asio::io_service &io_service, ConfigManager *config_manager, Router *router) : io_service_(io_service), acceptor_(io_service) {
-
-    config_manager_ = std::unique_ptr<ConfigManager>(config_manager);
-    router_ = std::unique_ptr<Router>(router);
-    acceptor_ = boost::asio::ip::tcp::acceptor(io_service, tcp::endpoint(tcp::v4(), config_manager_->port()));
+server::server(boost::asio::io_service &io_service, int port, Dispatcher* dispatcher) : io_service_(io_service),
+    dispatcher_(std::unique_ptr<Dispatcher>(dispatcher)),
+    acceptor_(boost::asio::ip::tcp::acceptor(io_service, tcp::endpoint(tcp::v4(), port))) {
 
     SetUpSignalHandlers();
-    BOOST_LOG_TRIVIAL(info) << "Port Number:" << config_manager_->port() << "\n";
+    BOOST_LOG_TRIVIAL(info) << "Port Number:" << port << "\n";
     start_accept();
 }
 
 void server::start_accept() {
-    session *new_session = session::makeSession(io_service_, router_.get());
+    session *new_session = session::makeSession(io_service_, dispatcher_.get());
     acceptor_.async_accept(new_session->socket(),
                            boost::bind(&server::handle_accept, this, new_session,
                                        boost::asio::placeholders::error));

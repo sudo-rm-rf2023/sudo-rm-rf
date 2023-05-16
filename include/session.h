@@ -15,6 +15,7 @@
 #include "echo_request_handler.h"
 #include "static_request_handler.h"
 #include "router.h"
+#include "dispatcher.h"
 
 using boost::asio::ip::tcp;
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
@@ -25,12 +26,12 @@ public:
   ~session(){
     printf("Session deleted.\n");
   }
-  session(boost::asio::io_service& io_service, Router* router) :socket_(io_service), router_(router) {
+  session(boost::asio::io_service& io_service, Dispatcher* dispatcher) :socket_(io_service), dispatcher_(dispatcher) {
     printf("Session created.\n");
   }
 
-  static session* makeSession(boost::asio::io_service& io_service, Router* router){
-    return new session(io_service, router);
+  static session* makeSession(boost::asio::io_service& io_service, Dispatcher* dispatcher){
+    return new session(io_service, dispatcher);
   }
 
   tcp::socket& socket();
@@ -43,7 +44,8 @@ private:
 
   tcp::socket socket_;
 
-  Router* router_;
+  //Router* router_;
+  Dispatcher* dispatcher_;
 
   boost::beast::flat_buffer buffer_;
 

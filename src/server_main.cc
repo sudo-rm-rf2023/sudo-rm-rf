@@ -6,6 +6,9 @@
 #include "server.h"
 #include "logger.h"
 #include "router.h"
+#include "config_utils.h"
+#include "dispatcher.h"
+#include "config_parser.h"
 
 
 int main(int argc, char *argv[]) {
@@ -17,29 +20,34 @@ int main(int argc, char *argv[]) {
     try {
         if (argc != 2) {
             BOOST_LOG_TRIVIAL(error) << "Usage: async_tcp_echo_server <config_file>";
-            std::cerr << "Usage: async_tcp_echo_server <config_file>\n";
             return 1;
         }
 
         boost::asio::io_service io_service;
 
-        using namespace std; // For atoi.
-        ConfigManager *config_manager = ConfigManager::makeConfigManager(argv[1]);
-        if (config_manager == nullptr) {
+        
+        NginxConfigParser parser;
+        NginxConfig config;
+        if (!parser.Parse(argv[1], &config)){
             BOOST_LOG_TRIVIAL(error) << "Invalid config file";
-            std::cerr << "Invalid config file\n";
             return 1;
         }
-        Router *router = Router::make_router(config_manager->getRouterEntries());
-        if(router == nullptr){
-            BOOST_LOG_TRIVIAL(error) << "Error Creating router.";
+        std::optional<int> port = config_util::getPortFromConfig(config);
+        if (!port){
+            BOOST_LOG_TRIVIAL(error) << "Invalid port configuration";
             return 1;
         }
-        server s(io_service, config_manager, router);
+        std::unordered_map<std::string, RequestHandlerFactory*> routes;
+        if(!map_config_to_handler_factory(config, routes)){
+            BOOST_LOG_TRIVIAL(error) << "Invalid handler configuration";
+            return 1;
+        }
+        Dispatcher* dispatcher = new Dispatcher(routes);
+
+        server s(io_service, port.value(), dispatcher);
         io_service.run();
     } catch (std::exception &e) {
         BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what();
-        std::cerr << "Exception: " << e.what() << "\n";
     }
 
     BOOST_LOG_TRIVIAL(info) << "Server shutting down";

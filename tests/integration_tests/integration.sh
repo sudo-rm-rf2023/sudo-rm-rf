@@ -34,7 +34,7 @@ ENDCOLOR=$([ "$USE_COLOR" = "true" ] && echo "\e[0m" || echo "")
 
 # Configuration
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"  # Get the directory of this script
-TEST_CONFIG="${SCRIPT_DIR}/test.conf"
+TEST_CONFIG="${SCRIPT_DIR}/assign6_test.conf"
 SERVER_BINARY="$1"
 TEST_PORT=8080
 
