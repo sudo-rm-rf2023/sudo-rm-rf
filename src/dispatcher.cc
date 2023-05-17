@@ -29,7 +29,10 @@ RequestHandlerFactory* Dispatcher::match(const std::string& request_url){
         return it->second;
     }
 
-    // according to spec a 404 handler will always be configured to root url
+    if(request_url == "/"){
+        return nullptr;
+    }
+
     size_t last_slash_pos = request_url.find_last_of('/');
     last_slash_pos = (last_slash_pos==std::string::npos) ? 0 : last_slash_pos;
     std::string parentUrl = request_url.substr(0, last_slash_pos);
@@ -44,6 +47,9 @@ status Dispatcher::assign_request(const http::request<http::string_body>& reques
 
     std::string request_url = request.target().to_string();
     RequestHandlerFactory* factory = match(request_url);
+    if(factory == nullptr){
+        return false;
+    }
     std::shared_ptr<RequestHandler> handler = factory->create();
     return handler->handle_request(request, response);
 }

@@ -69,6 +69,15 @@ TEST_F(DispatcherTest, assignStatic){
     EXPECT_EQ(response_.body(), "static");
 }
 
+TEST_F(DispatcherTest, NoURLMatch){
+    request_.target("/random");
+    EXPECT_FALSE(dispatcher_.assign_request(request_, response_));
+}
+
+TEST_F(DispatcherTest, NoURLMatch2){
+    request_.target("/");
+    EXPECT_FALSE(dispatcher_.assign_request(request_, response_));
+}
 
 // TODO:
 // write more test cases such as for 404 handlers and nested request paths;
