@@ -138,7 +138,8 @@ Before moving on to the next step, you should also have created unit tests for t
 
 1. Add a new `enum HandlerType` value in  `util.h`. For example, `NEW_HANDLER = 4`. 
 2. Register the new handler in the `create_hander_factory` function in `dispatcher.cc`.
-3. Register the new handler file and the tests in `CMakelist.txt`. Include the tests in coverage report.
+3. Register your new handler in `GetHandlerTypeFromToken` function in `config_util.cc`. This maps the handler keyword in config to the `enum` value.
+4. Register the new handler file and the tests in `CMakelist.txt`. Include the tests in coverage report.
 
 ### Add to Config Validation in `config_util`.
 
