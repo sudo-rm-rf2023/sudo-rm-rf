@@ -42,11 +42,13 @@ protected:
         std::unordered_map<std::string, RequestHandlerFactory*> routes;
         routes["/echo"] = &echoFactory_;
         routes["/static"] = &staticFactory_;
+        routes["/static/foo"] = &staticFactory2_;
         return routes;
     }
     
     MockRequestHandlerFactory echoFactory_;
     MockRequestHandlerFactory staticFactory_;
+    MockRequestHandlerFactory staticFactory2_;
     NginxConfig placeholder_config_;
     http::request<http::string_body> request_;
     http::response<http::string_body> response_;
@@ -79,6 +81,36 @@ TEST_F(DispatcherTest, NoURLMatch2){
     EXPECT_FALSE(dispatcher_.assign_request(request_, response_));
 }
 
-// TODO:
-// write more test cases such as for 404 handlers and nested request paths;
-// write tests for helper functions in dispatcher
+TEST_F(DispatcherTest, NoURLMatch3){
+    request_.target("/echostatic");
+    EXPECT_FALSE(dispatcher_.assign_request(request_, response_));
+}
+
+TEST_F(DispatcherTest, NoURLMatch4){
+    request_.target("/echostatic/static");
+    EXPECT_FALSE(dispatcher_.assign_request(request_, response_));
+}
+
+TEST_F(DispatcherTest, nestedPath){
+    std::shared_ptr<RequestHandler> expectedHandler = std::make_shared<TestHandler>("echo");
+    EXPECT_CALL(echoFactory_, create()).WillOnce(testing::Return(expectedHandler));
+    request_.target("/echo/static");
+    EXPECT_EQ(dispatcher_.assign_request(request_, response_), true);
+    EXPECT_EQ(response_.body(), "echo");
+}
+
+TEST_F(DispatcherTest, longestMatch){
+    std::shared_ptr<RequestHandler> expectedHandler = std::make_shared<TestHandler>("static2");
+    EXPECT_CALL(staticFactory2_, create()).WillOnce(testing::Return(expectedHandler));
+    request_.target("/static/foo");
+    EXPECT_EQ(dispatcher_.assign_request(request_, response_), true);
+    EXPECT_EQ(response_.body(), "static2");
+}
+
+TEST_F(DispatcherTest, longURL){
+    std::shared_ptr<RequestHandler> expectedHandler = std::make_shared<TestHandler>("static2");
+    EXPECT_CALL(staticFactory2_, create()).WillOnce(testing::Return(expectedHandler));
+    request_.target("/static/foo/bar/this/is/a/long/url");
+    EXPECT_EQ(dispatcher_.assign_request(request_, response_), true);
+    EXPECT_EQ(response_.body(), "static2");
+}
