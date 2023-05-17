@@ -13,13 +13,11 @@ namespace http = boost::beast::http; // from <boost/beast/http.hpp>
 
 class RequestHandler {
 public:
-    struct Options { // A parameter object for the RequestHandler constructors.
+    struct Options { // Deprecated
         std::string request_path;
         std::optional<std::string> base_dir;
     };
 
-    // A non-zero return value indicates error.
-    // Input: request. Output: response.
     virtual status handle_request(
         const http::request<http::string_body> &request,
         http::response<http::string_body> &response) = 0;

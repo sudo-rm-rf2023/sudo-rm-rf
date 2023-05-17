@@ -12,13 +12,13 @@ namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 class StaticRequestHandler : public RequestHandler {
     public:
         StaticRequestHandler(const std::string& location, const NginxConfig& config_block);
-        static StaticRequestHandler* makeStaticRequestHandler(const RequestHandler::Options& options);
+        static StaticRequestHandler* makeStaticRequestHandler(const RequestHandler::Options& options); // Deprecated
 
         status handle_request(
         const http::request<http::string_body>& request,
         http::response<http::string_body>& response) override;
     private:
-        StaticRequestHandler(const RequestHandler::Options& options);
+        StaticRequestHandler(const RequestHandler::Options& options); //Deprecated
         std::string request_path_;
         std::optional<std::string> base_dir_ = std::nullopt;
 };

@@ -7,6 +7,9 @@
 #include "utils.h"
 #include "config_utils.h"
 
+/*
+DEPRECATED
+*/
 class ConfigManager {
 public:
     static ConfigManager* makeConfigManager(const char* config_file);

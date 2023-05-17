@@ -14,6 +14,9 @@
 
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
+/*
+DEPRECATED
+*/
 class Router {
     public:
         Router() {}

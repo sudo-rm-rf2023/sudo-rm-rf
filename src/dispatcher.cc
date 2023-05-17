@@ -55,7 +55,6 @@ status Dispatcher::assign_request(const http::request<http::string_body>& reques
 }
 
  bool map_config_to_handler_factory(const NginxConfig &config, std::unordered_map<std::string, RequestHandlerFactory*> &routes){
-    // std::unordered_map<std::string, RequestHandlerFactory*> routes;
     std::optional<std::vector<DispatcherEntry>> dispatcher_entries = config_util::getDispatcherEntriesFromConfig(config);
     if (dispatcher_entries){
         for (DispatcherEntry entry : *dispatcher_entries){
@@ -69,7 +68,6 @@ status Dispatcher::assign_request(const http::request<http::string_body>& reques
             }
         }
     }
-    // return routes;
     return true;
 }
 

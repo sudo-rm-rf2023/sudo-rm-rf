@@ -17,7 +17,7 @@ protected:
         entry1_.handler_type = ECHO_HANDLER;
 
         entry2_.request_path = "/static";
-        entry2_.base_dir = "../static";
+        entry2_.base_dir = "./test_static";
         entry2_.handler_type = STATIC_HANDLER;
 
         entry3_.request_path = "/";

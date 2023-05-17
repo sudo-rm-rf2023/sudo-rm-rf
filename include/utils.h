@@ -25,7 +25,7 @@ enum HandlerType {
     NOTFOUND_HANDLER = 3,
 };
 
-struct RouterEntry {
+struct RouterEntry { // Deprecated
     std::string request_path;
     std::string base_dir; //TODO: change this to optional
     HandlerType handler_type;

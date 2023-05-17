@@ -32,42 +32,41 @@ set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.50 REQUIRED COMPONENTS system log log_setup)
 message(STATUS "Boost version: ${Boost_VERSION}")
 
-include_directories(include)
+include_directories(include legacy/include)
 
 # Add the new logger source file
 add_library(logger_lib src/logger.cc)
 
-# Update name and srcs
+# Libraries and source file
 add_library(server_lib src/server.cc)
 add_library(session_lib src/session.cc)
 add_library(config_parser_lib src/config_parser.cc)
-add_library(config_manager_lib src/config_manager.cc)
 add_library(echo_handler_lib src/echo_request_handler.cc)
 add_library(static_handler_lib src/static_request_handler.cc)
 add_library(not_found_handler_lib src/not_found_handler.cc)
-add_library(router_lib src/router.cc)
 add_library(util_lib src/util.cc)
 add_library(config_utils_lib src/config_utils.cc)
 add_library(dispatcher_lib src/dispatcher.cc)
 
-target_link_libraries(config_manager_lib config_parser_lib config_utils_lib)
+# Deprecated libraries
+add_library(config_manager_lib legacy/src/config_manager.cc)
+add_library(router_lib legacy/src/router.cc)
+
+# Dependencies
+target_link_libraries(config_manager_lib config_parser_lib config_utils_lib logger_lib)
 target_link_libraries(server_lib config_manager_lib session_lib logger_lib)
-target_link_libraries(session_lib echo_handler_lib static_handler_lib not_found_handler_lib router_lib dispatcher_lib)
+target_link_libraries(session_lib echo_handler_lib static_handler_lib not_found_handler_lib router_lib dispatcher_lib logger_lib)
 target_link_libraries(router_lib echo_handler_lib static_handler_lib not_found_handler_lib)
 target_link_libraries(config_utils_lib config_parser_lib util_lib logger_lib)
 target_link_libraries(dispatcher_lib config_utils_lib util_lib logger_lib static_handler_lib echo_handler_lib not_found_handler_lib)
-
-# Link Boost libraries
 target_link_libraries(logger_lib Boost::log Boost::log_setup Boost::system)
-target_link_libraries(server_lib logger_lib)
-target_link_libraries(config_manager_lib logger_lib)
 target_link_libraries(config_parser_lib logger_lib)
 target_link_libraries(static_handler_lib logger_lib util_lib config_utils_lib)
 target_link_libraries(echo_handler_lib logger_lib)
 target_link_libraries(not_found_handler_lib logger_lib)
-target_link_libraries(session_lib logger_lib)
 target_link_libraries(util_lib config_parser_lib)
 
+# main
 add_executable(server src/server_main.cc)
 target_link_libraries(server Boost::system server_lib session_lib echo_handler_lib static_handler_lib not_found_handler_lib router_lib)
 
@@ -77,9 +76,9 @@ target_link_libraries(config_parser_test config_parser_lib gtest_main)
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # config manager test
-add_executable(config_manager_test tests/config_manager_test.cc)
+add_executable(config_manager_test legacy/tests/config_manager_test.cc)
 target_link_libraries(config_manager_test config_manager_lib gtest_main)
-gtest_discover_tests(config_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+gtest_discover_tests(config_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/legacy/tests)
 
 # server test
 add_executable(server_test tests/server_test.cc)
@@ -121,9 +120,9 @@ target_link_libraries(session_test session_lib gtest_main)
 gtest_discover_tests(session_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # router test
-add_executable(router_test tests/router_test.cc)
+add_executable(router_test legacy/tests/router_test.cc)
 target_link_libraries(router_test router_lib gtest_main)
-gtest_discover_tests(router_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+gtest_discover_tests(router_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/legacy/tests)
 
 # config_utils test
 add_executable(config_utils_test tests/config_utils_test.cc)

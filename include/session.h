@@ -23,12 +23,7 @@ namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 // TODO: Write a module dedicated to process received request and produce a response
 class session {
 public:
-  ~session(){
-    printf("Session deleted.\n");
-  }
-  session(boost::asio::io_service& io_service, Dispatcher* dispatcher) :socket_(io_service), dispatcher_(dispatcher) {
-    printf("Session created.\n");
-  }
+  session(boost::asio::io_service& io_service, Dispatcher* dispatcher) :socket_(io_service), dispatcher_(dispatcher) {}
 
   static session* makeSession(boost::asio::io_service& io_service, Dispatcher* dispatcher){
     return new session(io_service, dispatcher);
@@ -44,7 +39,6 @@ private:
 
   tcp::socket socket_;
 
-  //Router* router_;
   Dispatcher* dispatcher_;
 
   boost::beast::flat_buffer buffer_;

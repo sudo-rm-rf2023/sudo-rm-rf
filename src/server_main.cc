@@ -29,7 +29,11 @@ int main(int argc, char *argv[]) {
         NginxConfigParser parser;
         NginxConfig config;
         if (!parser.Parse(argv[1], &config)){
-            BOOST_LOG_TRIVIAL(error) << "Invalid config file";
+            BOOST_LOG_TRIVIAL(error) << "Syntax error in config file.";
+            return 1;
+        }
+        if(!config_util::validateConfig(config)){
+            BOOST_LOG_TRIVIAL(error) << "Invalid config file.";
             return 1;
         }
         std::optional<int> port = config_util::getPortFromConfig(config);
