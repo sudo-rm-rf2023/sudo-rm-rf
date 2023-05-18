@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10.0)
+set(CMAKE_CXX_STANDARD 17)
 project(sudo-rm-rf)
 
 # Make sure developers do not run cmake in the main project directory, to keep
@@ -72,12 +73,12 @@ target_link_libraries(server Boost::system server_lib session_lib echo_handler_l
 
 # config parser test
 add_executable(config_parser_test tests/config_parser_test.cc)
-target_link_libraries(config_parser_test config_parser_lib gtest_main)
+target_link_libraries(config_parser_test config_parser_lib gtest_main gmock)
 gtest_discover_tests(config_parser_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # config manager test
 add_executable(config_manager_test legacy/tests/config_manager_test.cc)
-target_link_libraries(config_manager_test config_manager_lib gtest_main)
+target_link_libraries(config_manager_test config_manager_lib gtest_main gmock)
 gtest_discover_tests(config_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/legacy/tests)
 
 # server test
@@ -126,7 +127,7 @@ gtest_discover_tests(router_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/l
 
 # config_utils test
 add_executable(config_utils_test tests/config_utils_test.cc)
-target_link_libraries(config_utils_test config_utils_lib gtest_main)
+target_link_libraries(config_utils_test config_utils_lib gtest_main gmock)
 gtest_discover_tests(config_utils_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # Coverage target/test targets
