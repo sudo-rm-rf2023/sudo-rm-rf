@@ -51,6 +51,11 @@ TEST_F(ConfigUtilsTest, ConfigWithInvalidStaticLocationBlock){
     EXPECT_FALSE(config_util::validateConfig(config));
 }
 
+TEST_F(ConfigUtilsTest, ConfigWithInvalidCRUDLocationBlock){
+    ASSERT_TRUE(ParseFile("./test_configs/new_configs/invalid_crud_location_block.conf"));
+    EXPECT_FALSE(config_util::validateConfig(config));
+}
+
 TEST_F(ConfigUtilsTest, ConfigWithInvalidLocationStatement){
     ASSERT_TRUE(ParseFile("./test_configs/new_configs/invalid_location_statement.conf"));
     EXPECT_FALSE(config_util::validateConfig(config));

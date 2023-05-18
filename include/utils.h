@@ -23,6 +23,7 @@ enum HandlerType {
     ECHO_HANDLER = 1,
     STATIC_HANDLER = 2,
     NOTFOUND_HANDLER = 3,
+    CRUD_API_HANDLER = 4,
 };
 
 struct RouterEntry { // Deprecated

@@ -45,6 +45,7 @@ add_library(config_parser_lib src/config_parser.cc)
 add_library(echo_handler_lib src/echo_request_handler.cc)
 add_library(static_handler_lib src/static_request_handler.cc)
 add_library(not_found_handler_lib src/not_found_handler.cc)
+add_library(crud_api_handler_lib src/crud_api_handler.cc)
 add_library(util_lib src/util.cc)
 add_library(config_utils_lib src/config_utils.cc)
 add_library(dispatcher_lib src/dispatcher.cc)
@@ -59,12 +60,13 @@ target_link_libraries(server_lib config_manager_lib session_lib logger_lib)
 target_link_libraries(session_lib echo_handler_lib static_handler_lib not_found_handler_lib router_lib dispatcher_lib logger_lib)
 target_link_libraries(router_lib echo_handler_lib static_handler_lib not_found_handler_lib)
 target_link_libraries(config_utils_lib config_parser_lib util_lib logger_lib)
-target_link_libraries(dispatcher_lib config_utils_lib util_lib logger_lib static_handler_lib echo_handler_lib not_found_handler_lib)
+target_link_libraries(dispatcher_lib config_utils_lib util_lib logger_lib static_handler_lib echo_handler_lib not_found_handler_lib crud_api_handler_lib)
 target_link_libraries(logger_lib Boost::log Boost::log_setup Boost::system)
 target_link_libraries(config_parser_lib logger_lib)
 target_link_libraries(static_handler_lib logger_lib util_lib config_utils_lib)
 target_link_libraries(echo_handler_lib logger_lib)
 target_link_libraries(not_found_handler_lib logger_lib)
+target_link_libraries(crud_api_handler_lib logger_lib)
 target_link_libraries(util_lib config_parser_lib)
 
 # main
@@ -115,6 +117,11 @@ add_executable(not_found_handler_test tests/not_found_handler_test.cc)
 target_link_libraries(not_found_handler_test not_found_handler_lib gtest_main)
 gtest_discover_tests(not_found_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# crud_api_handler test
+add_executable(crud_api_handler_test tests/crud_api_handler_test.cc)
+target_link_libraries(crud_api_handler_test crud_api_handler_lib gtest_main)
+gtest_discover_tests(crud_api_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
 # session test
 add_executable(session_test tests/session_test.cc)
 target_link_libraries(session_test session_lib gtest_main)
@@ -135,8 +142,7 @@ include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
         server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib 
-        static_handler_lib not_found_handler_lib router_lib config_utils_lib dispatcher_lib
+        static_handler_lib not_found_handler_lib crud_api_handler_lib router_lib config_utils_lib dispatcher_lib
     TESTS 
         config_parser_test config_manager_test server_test session_test echo_request_handler_test 
-        static_request_handler_test not_found_handler_test router_test config_utils_test dispatcher_test)
-
+        static_request_handler_test not_found_handler_test crud_api_handler_test router_test config_utils_test dispatcher_test)

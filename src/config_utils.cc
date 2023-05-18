@@ -30,6 +30,8 @@ HandlerType GetHandlerTypeFromToken(std::string type_token) {
         return HandlerType::STATIC_HANDLER;
     } else if (type_token == "404Handler") {
         return HandlerType::NOTFOUND_HANDLER;
+    } else if (type_token == "CRUDApiHandler") {
+        return HandlerType::CRUD_API_HANDLER;
     } else {
         return HandlerType::UNDEFINED_HANDLER;
     }
@@ -42,6 +44,11 @@ bool ValidateLocationBlock(NginxConfig location_config, HandlerType type){
         break;
     case STATIC_HANDLER:
         if(!config_util::getBaseDirFromLocationConfig(location_config).has_value()){
+            return false;
+        }
+        break;
+    case CRUD_API_HANDLER:
+        if(!config_util::getDataPathFromLocationConfig(location_config).has_value()){
             return false;
         }
         break;
@@ -93,6 +100,15 @@ std::optional<int> getPortFromConfig(const NginxConfig &config) {
 std::optional<std::string> getBaseDirFromLocationConfig(const NginxConfig &location_config) {
     for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
         if (GetFirstTokenOfStatement(*statement) == "root" && StatementHasNTokens(*statement, 2)) {
+            return GetNthTokenOfStatement(*statement, 2);
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> getDataPathFromLocationConfig(const NginxConfig &location_config) {
+    for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
+        if (GetFirstTokenOfStatement(*statement) == "data_path" && StatementHasNTokens(*statement, 2)) {
             return GetNthTokenOfStatement(*statement, 2);
         }
     }

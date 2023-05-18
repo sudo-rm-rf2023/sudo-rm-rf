@@ -4,6 +4,7 @@
 #include "echo_request_handler.h"
 #include "static_request_handler.h"
 #include "not_found_handler.h"
+#include "crud_api_handler.h"
 #include "logger.h"
 
 // TODO:
@@ -17,6 +18,9 @@ RequestHandlerFactory* create_handler_factory(DispatcherEntry entry){
     }
     if (entry.handler_type == NOTFOUND_HANDLER){
         return new NotFoundHandlerFactory(entry.location, entry.location_config);
+    }
+    if (entry.handler_type == CRUD_API_HANDLER){
+        return new CRUDApiHandlerFactory(entry.location, entry.location_config);
     }
     return nullptr;
 }

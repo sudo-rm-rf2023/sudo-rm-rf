@@ -43,12 +43,14 @@ protected:
         routes["/echo"] = &echoFactory_;
         routes["/static"] = &staticFactory_;
         routes["/static/foo"] = &staticFactory2_;
+        routes["/crud/api"] = &CRUDFactory_;
         return routes;
     }
     
     MockRequestHandlerFactory echoFactory_;
     MockRequestHandlerFactory staticFactory_;
     MockRequestHandlerFactory staticFactory2_;
+    MockRequestHandlerFactory CRUDFactory_;
     NginxConfig placeholder_config_;
     http::request<http::string_body> request_;
     http::response<http::string_body> response_;
@@ -69,6 +71,14 @@ TEST_F(DispatcherTest, assignStatic){
     request_.target("/static");
     EXPECT_EQ(dispatcher_.assign_request(request_, response_), true);
     EXPECT_EQ(response_.body(), "static");
+}
+
+TEST_F(DispatcherTest, assignCRUD){
+    std::shared_ptr<RequestHandler> expectedHandler = std::make_shared<TestHandler>("CRUD");
+    EXPECT_CALL(CRUDFactory_, create()).WillOnce(testing::Return(expectedHandler));
+    request_.target("/crud/api");
+    EXPECT_EQ(dispatcher_.assign_request(request_, response_), true);
+    EXPECT_EQ(response_.body(), "CRUD");
 }
 
 TEST_F(DispatcherTest, NoURLMatch){

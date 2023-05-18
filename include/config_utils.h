@@ -18,6 +18,8 @@ std::optional<int> getPortFromConfig(const NginxConfig &config);
 
 std::optional<std::string> getBaseDirFromLocationConfig(const NginxConfig &location_config);
 
+std::optional<std::string> getDataPathFromLocationConfig(const NginxConfig &location_config);
+
 } // namespace config_util
 
 #endif
