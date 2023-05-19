@@ -1,7 +1,9 @@
 #ifndef CRUD_API_HANDLER_H
 #define CRUD_API_HANDLER_H
 
+#include "boost_file_system_io.h"
 #include "config_parser.h"
+#include "file_system_io_interface.h"
 #include "logger.h"
 #include "request_handler.h"
 #include "request_handler_factory.h"
@@ -10,7 +12,8 @@ namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 
 class CRUDApiHandler : public RequestHandler {
  public:
-  CRUDApiHandler(const std::string &location, const NginxConfig &config_block);
+  CRUDApiHandler(const std::string &location, const NginxConfig &config_block,
+                 std::shared_ptr<FileSystemIOInterface> file_system_io);
 
   status handle_request(const http::request<http::string_body> &request,
                         http::response<http::string_body> &response) override;
@@ -48,11 +51,15 @@ class CRUDApiHandler : public RequestHandler {
                                http::response<http::string_body> &response);
   /*
    * API: Returns a JSON list of valid IDs for the given Entity.
-   * Internally: Lists filenames in {data_path}/{entity}. Returns the list of file
-   * names in the response, or empty list for no existing entity.
+   * Internally: Lists filenames in {data_path}/{entity}. Returns the list of
+   * file names in the response, or empty list for no existing entity.
    */
   status handle_list_request(const http::request<http::string_body> &request,
                              http::response<http::string_body> &response);
+
+  std::shared_ptr<FileSystemIOInterface> file_system_io_;
+  std::string request_path_;
+  std::optional<std::string> data_path_;
 };
 
 class CRUDApiHandlerFactory : public RequestHandlerFactory {
@@ -62,7 +69,8 @@ class CRUDApiHandlerFactory : public RequestHandlerFactory {
       : RequestHandlerFactory(location, config_block) {}
 
   std::shared_ptr<RequestHandler> create() {
-    return std::make_shared<CRUDApiHandler>(location_, config_block_);
+    return std::make_shared<CRUDApiHandler>(
+        location_, config_block_, std::make_shared<BoostFileSystemIO>());
   }
 };
 

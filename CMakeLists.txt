@@ -49,6 +49,7 @@ add_library(crud_api_handler_lib src/crud_api_handler.cc)
 add_library(util_lib src/util.cc)
 add_library(config_utils_lib src/config_utils.cc)
 add_library(dispatcher_lib src/dispatcher.cc)
+add_library(boost_file_system_io_lib src/boost_file_system_io.cc)
 
 # Deprecated libraries
 add_library(config_manager_lib legacy/src/config_manager.cc)
@@ -60,14 +61,15 @@ target_link_libraries(server_lib config_manager_lib session_lib logger_lib)
 target_link_libraries(session_lib echo_handler_lib static_handler_lib not_found_handler_lib router_lib dispatcher_lib logger_lib)
 target_link_libraries(router_lib echo_handler_lib static_handler_lib not_found_handler_lib)
 target_link_libraries(config_utils_lib config_parser_lib util_lib logger_lib)
-target_link_libraries(dispatcher_lib config_utils_lib util_lib logger_lib static_handler_lib echo_handler_lib not_found_handler_lib crud_api_handler_lib)
+target_link_libraries(dispatcher_lib config_utils_lib util_lib logger_lib static_handler_lib echo_handler_lib not_found_handler_lib crud_api_handler_lib boost_file_system_io_lib)
 target_link_libraries(logger_lib Boost::log Boost::log_setup Boost::system)
 target_link_libraries(config_parser_lib logger_lib)
 target_link_libraries(static_handler_lib logger_lib util_lib config_utils_lib)
 target_link_libraries(echo_handler_lib logger_lib)
 target_link_libraries(not_found_handler_lib logger_lib)
-target_link_libraries(crud_api_handler_lib logger_lib)
+target_link_libraries(crud_api_handler_lib logger_lib config_utils_lib)
 target_link_libraries(util_lib config_parser_lib)
+target_link_libraries(boost_file_system_io_lib logger_lib)
 
 # main
 add_executable(server src/server_main.cc)
@@ -137,12 +139,17 @@ add_executable(config_utils_test tests/config_utils_test.cc)
 target_link_libraries(config_utils_test config_utils_lib gtest_main gmock)
 gtest_discover_tests(config_utils_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# file_system_io test
+add_executable(boost_file_system_io_test tests/boost_file_system_io_test.cc)
+target_link_libraries(boost_file_system_io_test boost_file_system_io_lib gtest_main)
+gtest_discover_tests(boost_file_system_io_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
 # Coverage target/test targets
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
         server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib 
-        static_handler_lib not_found_handler_lib crud_api_handler_lib router_lib config_utils_lib dispatcher_lib
+        static_handler_lib not_found_handler_lib crud_api_handler_lib router_lib config_utils_lib dispatcher_lib boost_file_system_io_lib
     TESTS 
         config_parser_test config_manager_test server_test session_test echo_request_handler_test 
-        static_request_handler_test not_found_handler_test crud_api_handler_test router_test config_utils_test dispatcher_test)
+        static_request_handler_test not_found_handler_test crud_api_handler_test router_test config_utils_test dispatcher_test boost_file_system_io_test)
