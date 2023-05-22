@@ -7,7 +7,7 @@ EXPECTED_RESPONSE_FILE="${SCRIPT_DIR}/../test_static_root/test_sudo-rm-rf-comman
 ACTUAL_RESPONSE_FILE="${SCRIPT_DIR}/actual_static_png_response.png"
 
 # Send a request to the web server to get the static file and save the output to ACTUAL_RESPONSE_FILE
-curl --output "$ACTUAL_RESPONSE_FILE" -s -S http://localhost:$TEST_PORT/static/test_sudo-rm-rf-command.png
+curl --output "$ACTUAL_RESPONSE_FILE" -s -S http://localhost:$TEST_PORT/static/test_sudo-rm-rf-command.png -H "User-Agent:"
 
 # Compare the received file (ACTUAL_RESPONSE_FILE) with the expected file (EXPECTED_RESPONSE_FILE)
 # -b option ignores line endings (Windows vs. Linux)

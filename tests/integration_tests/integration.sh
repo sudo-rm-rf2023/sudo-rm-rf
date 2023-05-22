@@ -51,7 +51,7 @@ echo -e "${BOLDBLUE}${COMMAND_NAME}${ENDCOLOR}"
 
 
 check_server_running() {
-  if ! ps -p $SERVER_PID > /dev/null; then
+  if ! ps -p "$SERVER_PID" > /dev/null; then
     echo "Web server is not running. Exiting..."
     exit 1
   fi
@@ -59,24 +59,24 @@ check_server_running() {
 
 # Run the web server binary with the test config file in the background
 # Assume script is in the tests directory
-$SERVER_BINARY "${TEST_CONFIG}" &
+"$SERVER_BINARY" "${TEST_CONFIG}" &
 SERVER_PID=$!
 
 # Give the server some time to start
 sleep 1
 
 # Execute each test script and collect results
-for TEST_SCRIPT in ${SCRIPT_DIR}/integration/*_test.sh; do
+for TEST_SCRIPT in "${SCRIPT_DIR}/integration/"*_test.sh; do
   ((TOTAL_TESTS++))
   # Check if the web server is running before executing the test
   check_server_running
 
   echo -e "${BOLDYELLOW}Running test $TEST_SCRIPT${ENDCOLOR}"
-  RESULT=$(bash "$TEST_SCRIPT" "${SCRIPT_DIR}/integration" $TEST_PORT)
+  RESULT=$(bash "$TEST_SCRIPT" "${SCRIPT_DIR}/integration" "$TEST_PORT")
   # echo -e "${BOLDBLUE}Result: $RESULT${ENDCOLOR}"
   if [ "$RESULT" == "PASS" ]; then
     ((PASSED_TESTS++))
-    echo -e "Test ${BOLDGREEN}$(basename $TEST_SCRIPT): PASS${ENDCOLOR}"
+    echo -e "Test ${BOLDGREEN}$(basename "$TEST_SCRIPT"): PASS${ENDCOLOR}"
   else
     ((FAILED_TESTS++))
     echo -e "Test ${TEST_SCRIPT}: ${ITALICRED}FAIL ${ENDCOLOR}"
@@ -85,7 +85,8 @@ for TEST_SCRIPT in ${SCRIPT_DIR}/integration/*_test.sh; do
 done
 
 # Shut down the web server
-kill $SERVER_PID
+kill "$SERVER_PID"
+
 # Remove the temporary files
 # rm -f ${SCRIPT_DIR}/integration/actual_*
 
