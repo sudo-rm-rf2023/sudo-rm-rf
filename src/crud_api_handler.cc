@@ -1,9 +1,13 @@
 #include "crud_api_handler.h"
+#include <boost/beast/http.hpp>
+#include <boost/filesystem.hpp>
 
 #include <optional>
 #include <vector>
 
 #include "config_utils.h"
+
+namespace http = boost::beast::http;
 
 CRUDApiHandler::CRUDApiHandler(
     const std::string &location, const NginxConfig &config_block,
@@ -14,12 +18,64 @@ CRUDApiHandler::CRUDApiHandler(
   file_system_io_ = file_system_io;
 }
 
+/**
+ * Given a request object, generate a response for the appropriate CRUD operation on Entities.
+*/
 status CRUDApiHandler::handle_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
+  http::verb req_method = request.method();
   BOOST_LOG_TRIVIAL(trace) << "Handling request to CRUDApiHandler. Method="
-                           << request.method();
-  return false;
+                           << req_method;
+
+  response.clear();
+  response.version(11);
+  response.set(http::field::content_type, "text/plain");
+
+  bool status_;
+  switch (req_method) {
+    case http::verb::get:
+      if (isFile(request.target().to_string())) {
+        BOOST_LOG_TRIVIAL(trace) << "Processing RETRIEVE request...";
+        status_ = handle_retrieve_request(request, response);
+        break;
+      }
+      else if (isDirectory(request.target().to_string())) {
+        BOOST_LOG_TRIVIAL(trace) << "Processing LIST request...";
+        status_ = handle_list_request(request, response);
+        break;
+      }
+      else {
+        BOOST_LOG_TRIVIAL(trace) << "GET request cannot be processed - invalid requested path.\n" << "Allowed requested path formats: '/api/Shoes' or '/api/Shoes/1'";
+        response.result(http::status::bad_request);
+        response.body() = "Unsupported HTTP verb provided: " +
+                    http::to_string(req_method).to_string();
+        status_ = false;
+        break;
+      }
+    case http::verb::post:
+      BOOST_LOG_TRIVIAL(trace) << "Processing POST/CREATE request...";
+      status_ = handle_create_request(request, response);
+      break;
+    case http::verb::put:
+      BOOST_LOG_TRIVIAL(trace) << "Processing PUT/UPDATE request...";
+      status_ = handle_update_request(request, response);
+      break;
+    case http::verb::delete_:
+      BOOST_LOG_TRIVIAL(trace) << "Processing DELETE request...";
+      status_ = handle_delete_request(request, response);
+      break;
+    default:
+      BOOST_LOG_TRIVIAL(trace)
+          << "Processing unknown request: " << http::to_string(req_method);
+      response.result(http::status::internal_server_error);
+      response.body() = "Unsupported HTTP verb provided: " +
+                   http::to_string(req_method).to_string();
+      status_ = false;
+  }
+
+  response.prepare_payload();
+  return status_;
 }
 
 std::string CRUDApiHandler::create_absolute_file_path(
@@ -43,7 +99,7 @@ status CRUDApiHandler::handle_create_request(
   if (absolute_dir_path == "") {
     BOOST_LOG_TRIVIAL(error)
         << "Failed to generate absolute path with target :" << request.target();
-    response.result(http::status::internal_server_error);
+    response.result(http::status::bad_request);
     return false;
   }
   BOOST_LOG_TRIVIAL(debug) << "absolute path: " << absolute_dir_path;
@@ -89,7 +145,6 @@ status CRUDApiHandler::handle_create_request(
   response.result(http::status::ok);
   response.set(http::field::content_type, mime_type(".json"));
   response.body() = body_str;
-  response.prepare_payload();
   return true;
 }
 /**
@@ -224,7 +279,7 @@ status CRUDApiHandler::handle_list_request(
     const std::vector<std::string> &data = files.value();
     std::string responseBody = "[";
     for (size_t i = 0; i < data.size(); ++i) {
-      responseBody += data[i];
+      responseBody += stripLeadingSlash(data[i]);
       if (i != data.size() - 1) {
         responseBody += ",";
       }
@@ -241,8 +296,32 @@ status CRUDApiHandler::handle_list_request(
   }
 }
 
-std::string formatJsonObject(const std::string &label, const std::string &value){
+std::string CRUDApiHandler::formatJsonObject(const std::string &label, const std::string &value){
   std::string ret;
   ret = "{\"" + label + "\":" + value + "}";
   return ret;
+}
+
+bool CRUDApiHandler::isFile(const std::string& target)
+{
+    size_t slashCount = std::count(target.begin(), target.end(), '/');
+    return slashCount == 3;  // eg: "/api/Shoes/1"
+}
+
+bool CRUDApiHandler::isDirectory(const std::string& target)
+{
+    size_t slashCount = std::count(target.begin(), target.end(), '/');
+    return slashCount == 2;  // eg: "/api/Shoes"
+}
+
+std::string CRUDApiHandler::stripLeadingSlash(const std::string& str)
+{
+    if (!str.empty() && str[0] == '/')
+    {
+        return str.substr(1);
+    }
+    else
+    {
+        return str;
+    }
 }
