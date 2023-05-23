@@ -57,14 +57,13 @@ class CRUDApiHandler : public RequestHandler {
   status handle_list_request(const http::request<http::string_body> &request,
                              http::response<http::string_body> &response);
 
+  std::string create_absolute_file_path(
+      const http::request<http::string_body> &request);
+
   /*
    * API: returns an absolute file path when given an http request. If not a
    * valid path, return an empty string.
    */
-  std::string create_absolute_file_path(
-      const http::request<http::string_body> &request);
-  std::string formatJsonObject(const std::string &label,
-                               const std::string &value);
   std::shared_ptr<FileSystemIOInterface> file_system_io_;
   std::string request_path_;
   std::optional<std::string> data_path_;
@@ -81,5 +80,8 @@ class CRUDApiHandlerFactory : public RequestHandlerFactory {
         location_, config_block_, std::make_shared<BoostFileSystemIO>());
   }
 };
+
+std::string formatJsonObject(const std::string &label,
+                             const std::string &value);
 
 #endif

@@ -22,12 +22,6 @@ status CRUDApiHandler::handle_request(
   return false;
 }
 
-std::string CRUDApiHandler::formatJsonObject(const std::string &label, const std::string &value){
-  std::string ret;
-  ret = "{\"" + label + "\":" + value + "}";
-  return ret;
-}
-
 std::string CRUDApiHandler::create_absolute_file_path(
     const http::request<http::string_body> &request) {
   std::string full_url_path = request.target().to_string();
@@ -98,7 +92,63 @@ status CRUDApiHandler::handle_create_request(
   response.prepare_payload();
   return true;
 }
+/**
+ * @brief API: Updates the data for entity/ID with new data, resp w/ status.
+ * Internally: writes req body to
+ * {data_path}/{entity}/{ID}, responds "SUCCESS" or "FAIL" if DNE.
+ * @param request
+ * @param response
+ * @return status
+ */
+status CRUDApiHandler::handle_update_request(
+    const http::request<http::string_body> &request,
+    http::response<http::string_body> &response) {
+  BOOST_LOG_TRIVIAL(trace) << "handling update request";
+  std::string absolute_path = create_absolute_file_path(request);
+  BOOST_LOG_TRIVIAL(trace) << "Handling request for retrieve";
+  if (absolute_path == "") {
+    BOOST_LOG_TRIVIAL(debug)
+        << request_path_ << " is not a prefix of "
+        << request.target().to_string()
+        << ". Cannot resolve to an absolute path on filesystem.";
+    response.result(http::status::bad_request);
+    return false;
+  }
+  // check if file exists
+  std::optional<std::ostringstream> object =
+      file_system_io_->read_file(absolute_path);
+  if (object.has_value()) {
+    response.result(http::status::ok);
+    BOOST_LOG_TRIVIAL(trace) << "found object.";
+  } else {
+    response.result(http::status::not_found);
+    BOOST_LOG_TRIVIAL(trace) << "Cannot update object: not found.";
+    return false;
+  }
+  // since file exists, update it
+  std::ostringstream content;
+  content << request.body();
+  bool success = file_system_io_->write_file(absolute_path, content);
+  if (success) {
+    BOOST_LOG_TRIVIAL(trace) << "wrote content to entity: " << request.target();
+    response.result(http::status::ok);
+  } else {
+    BOOST_LOG_TRIVIAL(trace)
+        << "failed to write content to entity: " << request.target();
+    response.result(http::status::internal_server_error);
+  }
+  response.prepare_payload();
+  return success;
+}
 
+/**
+ * @brief API: Delete entity w/ ID from the system
+ * Internally: Removes file {data_path}/{entity}/{ID} and respond "SUCCESS" ifit
+ * exists, else response "FAIL"
+ * @param request
+ * @param response
+ * @return status
+ */
 status CRUDApiHandler::handle_delete_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
@@ -126,7 +176,7 @@ status CRUDApiHandler::handle_delete_request(
 status CRUDApiHandler::handle_retrieve_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
-  BOOST_LOG_TRIVIAL(trace) << "Handling request for deleting...";
+  BOOST_LOG_TRIVIAL(trace) << "Handling request for retrieve";
 
   std::string absolute_path = create_absolute_file_path(request);
   if (absolute_path == "") {
@@ -189,4 +239,10 @@ status CRUDApiHandler::handle_list_request(
     BOOST_LOG_TRIVIAL(trace) << "Cannot retrieve directory.";
     return false;
   }
+}
+
+std::string formatJsonObject(const std::string &label, const std::string &value){
+  std::string ret;
+  ret = "{\"" + label + "\":" + value + "}";
+  return ret;
 }

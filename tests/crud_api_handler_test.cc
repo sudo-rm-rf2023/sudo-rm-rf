@@ -166,3 +166,39 @@ TEST_F(CRUDApiHandlerTest, SmokeTest) {
 //     }
 //   }
 // }
+
+// TEST_F(CRUDApiHandlerTest, PutChangeEntityTest) {
+//   // prepare request
+//   request_ = {boost::beast::http::verb::put,
+//               /*target=*/"/api/Shoes/1", /*version=*/11};
+//   std::string payload = "{Jeremiah was a bullfrog}";
+//   request_.body() = payload;
+//   request_.prepare_payload();
+//   EXPECT_EQ(payload, request_.body());
+//   EXPECT_TRUE(handler_->handle_request(request_, response_));
+//   EXPECT_EQ(response_.result_int(), 200);
+
+//   // test contents of file are expected
+//   std::optional<std::ostringstream> bytes_read =
+//       file_system_io_->read_file("/mnt/crud/Shoes/1");
+//   ASSERT_TRUE(bytes_read.has_value());
+//   if (bytes_read.has_value()) {
+//     ASSERT_EQ(bytes_read.value().str(), payload);
+//   } else {
+//     BOOST_LOG_TRIVIAL(debug) << "No contents found";
+//     return;
+//   }
+//   payload = "{was a good friend of mine}";
+//   request_.body() = payload;
+//   request_.prepare_payload();
+//   EXPECT_EQ(payload, request_.body());
+//   EXPECT_TRUE(handler_->handle_request(request_, response_));
+//   bytes_read = file_system_io_->read_file("/mnt/crud/Shoes/1");
+//   ASSERT_TRUE(bytes_read.has_value());
+//   if (bytes_read.has_value()) {
+//     ASSERT_EQ(bytes_read.value().str(), payload);
+//   } else {
+//     BOOST_LOG_TRIVIAL(debug) << "No contents found the second time";
+//     return;
+//   }
+// }
