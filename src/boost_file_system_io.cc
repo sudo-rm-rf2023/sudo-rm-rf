@@ -59,6 +59,7 @@ bool BoostFileSystemIO::delete_file(std::string file_path) {
 
 std::optional<std::vector<std::string>> BoostFileSystemIO::ls(
     std::string dir_name) {
+  BOOST_LOG_TRIVIAL(trace) << "LS : " << dir_name;
   fs::path dir_path(dir_name);
   if (!fs::exists(dir_path) || !fs::is_directory(dir_path)) {
     BOOST_LOG_TRIVIAL(debug) << "Cannot list files in: " << dir_path

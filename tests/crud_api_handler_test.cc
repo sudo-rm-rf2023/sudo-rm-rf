@@ -15,7 +15,6 @@ class TestFileSystemIO : public FileSystemIOInterface {
     if (file_system_.find(file_path) == file_system_.end()) {
       return std::nullopt;
     }
-
     std::ostringstream bytes_read;
     bytes_read << file_system_[file_path];
     return bytes_read;
@@ -39,16 +38,26 @@ class TestFileSystemIO : public FileSystemIOInterface {
   }
 
   std::optional<std::vector<std::string>> ls(std::string dir_name) {
+    BOOST_LOG_TRIVIAL(trace) << "LS : " << dir_name;
     std::vector<std::string> result;
+    bool found_entry = false;
     for (const auto& entry : file_system_) {
       std::string full_path = entry.first;
+      if (dir_name.length() > full_path.length()) {
+        continue;  // skip if there is no way to compare
+      }
       bool file_in_dir = full_path.compare(0, dir_name.length(), dir_name) == 0;
       if (file_in_dir) {
+        found_entry = true;
         std::string file_name = full_path.substr(dir_name.length());
         result.push_back(file_name);
       }
     }
-    return result;
+    if (found_entry) {
+      return result;
+    } else {
+      return std::nullopt;  // expected for file DNE
+    }
   }
 
  private:
@@ -58,12 +67,23 @@ class TestFileSystemIO : public FileSystemIOInterface {
 class CRUDApiHandlerTest : public ::testing::Test {
  protected:
   CRUDApiHandlerTest() {
-    file_system_io_->write_file("/mnt/crud/Shoes/1", std::ostringstream());
-    file_system_io_->write_file("/mnt/crud/Shoes/2", std::ostringstream());
-    file_system_io_->write_file("/mnt/crud/Shoes/3", std::ostringstream());
-    file_system_io_->write_file("/mnt/crud/Books/1", std::ostringstream());
+    BOOST_LOG_TRIVIAL(debug) << "Starting test";
+    try {
+      file_system_io_->write_file("/mnt/crud/Shoes/1", std::ostringstream());
+      file_system_io_->write_file("/mnt/crud/Shoes/2", std::ostringstream());
+      file_system_io_->write_file("/mnt/crud/Shoes/3", std::ostringstream());
+      file_system_io_->write_file("/mnt/crud/Books/1", std::ostringstream());
+    } catch (...) {
+      BOOST_LOG_TRIVIAL(error) << "Couldn't write to IO";
+    }
 
     NginxConfig config;
+    std::shared_ptr<NginxConfigStatement> statement =
+        std::make_shared<NginxConfigStatement>();
+    statement->tokens_.push_back("data_path");
+    statement->tokens_.push_back("/mnt/crud");
+
+    config.statements_.push_back(statement);
     handler_ =
         std::make_shared<CRUDApiHandler>(location_, config, file_system_io_);
   }
@@ -99,9 +119,50 @@ TEST_F(CRUDApiHandlerTest, TestFileSystemIOWorksAsExpected) {
   EXPECT_TRUE(std::find(files.begin(), files.end(), "Shoes/3") != files.end());
   EXPECT_TRUE(std::find(files.begin(), files.end(), "Books/1") != files.end());
   EXPECT_TRUE(std::find(files.begin(), files.end(), "Phones/1") != files.end());
+  files_opt = file_system_io_->ls("/mnt/crud/DOES_NOT_EXIST");
+  ASSERT_FALSE(files_opt.has_value());
 }
 
 TEST_F(CRUDApiHandlerTest, SmokeTest) {
   bool success = handler_->handle_request(request_, response_);
   ASSERT_FALSE(success);
 }
+
+// TEST_F(CRUDApiHandlerTest, CreateNewEntityTest) {
+//   // prepare request
+//   request_ = {boost::beast::http::verb::post,
+//               /*target=*/"/api/Lyrics", /*version=*/11};
+//   std::string payload = "{Jeremiah was a bullfrog}";
+//   request_.body() = payload;
+//   request_.prepare_payload();
+
+//   EXPECT_EQ(payload, request_.body());
+
+//   EXPECT_TRUE(handler_->handle_request(request_, response_));
+//   EXPECT_EQ(response_.result_int(), 200);
+//   EXPECT_EQ(response_[http::field::content_type].to_string(),
+//             "application/json");
+//   EXPECT_EQ(response_.body(), "{\"id\":1}");
+//   // test file is created
+//   const std::optional<std::vector<std::string>>& files_opt =
+//       file_system_io_->ls("/mnt/crud/Lyrics");
+//   ASSERT_TRUE(files_opt.has_value());
+//   if (!files_opt.has_value()) {
+//     BOOST_LOG_TRIVIAL(debug) << "No such directory: /mnt/crud/Lyrics";
+//     return;
+//   } else {
+//     BOOST_LOG_TRIVIAL(debug) << "Directory found!";
+//     std::vector<std::string> files = files_opt.value();
+//     ASSERT_EQ(files[0], "/1");
+//     // test contents of file are expected
+//     std::optional<std::ostringstream> bytes_read =
+//         file_system_io_->read_file("/mnt/crud/Lyrics/1");
+//     ASSERT_TRUE(bytes_read.has_value());
+//     if (bytes_read.has_value()) {
+//       ASSERT_EQ(bytes_read.value().str(), payload);
+//     } else {
+//       BOOST_LOG_TRIVIAL(debug) << "No contents found";
+//       return;
+//     }
+//   }
+// }

@@ -1,11 +1,14 @@
 #include "crud_api_handler.h"
 
-#include "config_utils.h"
 #include <optional>
+#include <vector>
+
+#include "config_utils.h"
 
 CRUDApiHandler::CRUDApiHandler(
     const std::string &location, const NginxConfig &config_block,
     std::shared_ptr<FileSystemIOInterface> file_system_io) {
+  BOOST_LOG_TRIVIAL(trace) << "Creating CRUDApiHandler...";
   request_path_ = location;
   data_path_ = config_util::getDataPathFromLocationConfig(config_block);
   file_system_io_ = file_system_io;
@@ -14,20 +17,86 @@ CRUDApiHandler::CRUDApiHandler(
 status CRUDApiHandler::handle_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
-  BOOST_LOG_TRIVIAL(trace) << "Handling request to CRUDApiHandler...";
-
-  // TODO add implementation details
+  BOOST_LOG_TRIVIAL(trace) << "Handling request to CRUDApiHandler. Method="
+                           << request.method();
   return false;
 }
 
-std::string CRUDApiHandler::create_absolute_file_path(const http::request<http::string_body> &request) {
+std::string CRUDApiHandler::formatJsonObject(const std::string &label, const std::string &value){
+  std::string ret;
+  ret = "{\"" + label + "\":" + value + "}";
+  return ret;
+}
+
+std::string CRUDApiHandler::create_absolute_file_path(
+    const http::request<http::string_body> &request) {
   std::string full_url_path = request.target().to_string();
   if (full_url_path.compare(0, request_path_.length(), request_path_) != 0) {
-    return ""; // cannot find valid path
+    return "";  // cannot find valid path
   }
 
   std::string file_path = full_url_path.substr(request_path_.length());
   return data_path_.value() + file_path;
+}
+
+status CRUDApiHandler::handle_create_request(
+    const http::request<http::string_body> &request,
+    http::response<http::string_body> &response) {
+  BOOST_LOG_TRIVIAL(trace) << "handling create request";
+
+  int max_id = 1;  // IDs start at 1 for each entity
+  std::string absolute_dir_path = create_absolute_file_path(request);
+  if (absolute_dir_path == "") {
+    BOOST_LOG_TRIVIAL(error)
+        << "Failed to generate absolute path with target :" << request.target();
+    response.result(http::status::internal_server_error);
+    return false;
+  }
+  BOOST_LOG_TRIVIAL(debug) << "absolute path: " << absolute_dir_path;
+  const std::optional<std::vector<std::string>> &entities =
+      file_system_io_->ls(absolute_dir_path);
+
+  if (entities.has_value()) {
+    BOOST_LOG_TRIVIAL(trace) << "Finding ID for entry";
+    // since the file names are just the ID, loop to find largest id
+    for (const std::string &ent : entities.value()) {
+      try {
+        int id = std::stoi(ent);
+        if (id > max_id) {
+          max_id = id;
+        }
+      } catch (...) {
+        BOOST_LOG_TRIVIAL(error) << "Directory entry is not `int ID`: " << ent;
+        continue;
+      }
+    }
+  } else {
+    BOOST_LOG_TRIVIAL(debug) << "No existing directory at requested path: \""
+                             << absolute_dir_path << "\"";
+  }
+
+  std::string entity_file_path =
+      absolute_dir_path + "/" + std::to_string(max_id);  // update the abs path
+  BOOST_LOG_TRIVIAL(info) << "Creating entity at requested path: \""
+                          << entity_file_path << "\"";
+  std::ostringstream contents;
+  contents << request.body();
+  BOOST_LOG_TRIVIAL(info) << "Writing request body to new entity";
+  bool success = file_system_io_->write_file(entity_file_path, contents);
+  if (!success) {
+    BOOST_LOG_TRIVIAL(error) << "Failed to create file: " << entity_file_path;
+    response.result(http::status::internal_server_error);
+    return false;
+  }
+  // Set content type and status
+  std::string json_label = "id";
+  std::string json_value = std::to_string(max_id);
+  std::string body_str = formatJsonObject(json_label,json_value );
+  response.result(http::status::ok);
+  response.set(http::field::content_type, mime_type(".json"));
+  response.body() = body_str;
+  response.prepare_payload();
+  return true;
 }
 
 status CRUDApiHandler::handle_delete_request(
@@ -38,8 +107,9 @@ status CRUDApiHandler::handle_delete_request(
   std::string absolute_path = create_absolute_file_path(request);
   if (absolute_path == "") {
     BOOST_LOG_TRIVIAL(debug)
-    << request_path_ << " is not a prefix of " << request.target().to_string()
-    << ". Cannot resolve to an absolute path on filesystem.";
+        << request_path_ << " is not a prefix of "
+        << request.target().to_string()
+        << ". Cannot resolve to an absolute path on filesystem.";
     response.result(http::status::bad_request);
     return false;
   }
@@ -53,19 +123,23 @@ status CRUDApiHandler::handle_delete_request(
   return success;
 }
 
-status CRUDApiHandler::handle_retrieve_request(const http::request<http::string_body> &request, http::response<http::string_body> &response) {
+status CRUDApiHandler::handle_retrieve_request(
+    const http::request<http::string_body> &request,
+    http::response<http::string_body> &response) {
   BOOST_LOG_TRIVIAL(trace) << "Handling request for deleting...";
 
   std::string absolute_path = create_absolute_file_path(request);
   if (absolute_path == "") {
     BOOST_LOG_TRIVIAL(debug)
-    << request_path_ << " is not a prefix of " << request.target().to_string()
-    << ". Cannot resolve to an absolute path on filesystem.";
+        << request_path_ << " is not a prefix of "
+        << request.target().to_string()
+        << ". Cannot resolve to an absolute path on filesystem.";
     response.result(http::status::bad_request);
     return false;
   }
 
-  std::optional<std::ostringstream> object = file_system_io_->read_file(absolute_path);
+  std::optional<std::ostringstream> object =
+      file_system_io_->read_file(absolute_path);
   if (object.has_value()) {
     response.result(http::status::ok);
     response.body() = object.value().str();
@@ -78,30 +152,32 @@ status CRUDApiHandler::handle_retrieve_request(const http::request<http::string_
   }
 }
 
-status CRUDApiHandler::handle_list_request(const http::request<http::string_body> &request, http::response<http::string_body> &response) {
+status CRUDApiHandler::handle_list_request(
+    const http::request<http::string_body> &request,
+    http::response<http::string_body> &response) {
   BOOST_LOG_TRIVIAL(trace) << "Handling request for LIST...";
 
   std::string absolute_path = create_absolute_file_path(request);
   if (absolute_path == "") {
     BOOST_LOG_TRIVIAL(debug)
-    << request_path_ << " is not a prefix of " << request.target().to_string()
-    << ". Cannot resolve to an absolute path on filesystem.";
+        << request_path_ << " is not a prefix of "
+        << request.target().to_string()
+        << ". Cannot resolve to an absolute path on filesystem.";
     response.result(http::status::bad_request);
     return false;
   }
-  
-  std::optional<std::vector<std::string>> files = file_system_io_->ls(absolute_path);
+
+  std::optional<std::vector<std::string>> files =
+      file_system_io_->ls(absolute_path);
   if (files.has_value()) {
     // Convert list of strings into a string with comma separated values
-    const std::vector<std::string>& data = files.value();
+    const std::vector<std::string> &data = files.value();
     std::string responseBody = "[";
-    for (size_t i = 0; i < data.size(); ++i)
-    {
-        responseBody += data[i];
-        if (i != data.size() - 1)
-        {
-            responseBody += ",";
-        }
+    for (size_t i = 0; i < data.size(); ++i) {
+      responseBody += data[i];
+      if (i != data.size() - 1) {
+        responseBody += ",";
+      }
     }
     responseBody += "]";
     response.result(http::status::ok);
