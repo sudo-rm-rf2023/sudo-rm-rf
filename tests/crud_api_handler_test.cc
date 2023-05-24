@@ -169,14 +169,14 @@ TEST_F(CRUDApiHandlerTest, CreateNewEntityTest) {
   }
 }
 
-TEST_F(CRUDApiHandlerTest, HandleCreateRequest_EmptyPath_ReturnsBadRequest) {
+TEST_F(CRUDApiHandlerTest, HandleCreateRequest_EmptyPath_ReturnsNotFound) {
   // Create request
   request_ = {boost::beast::http::verb::post,
               /*target=*/"", /*version=*/11};
   bool success = handler_->handle_request(request_, response_);
 
   EXPECT_FALSE(success);
-  EXPECT_EQ(response_.result(), http::status::bad_request);
+  EXPECT_EQ(response_.result(), http::status::not_found);
 }
 
 /*** UPDATE tests ***/
@@ -227,14 +227,14 @@ TEST_F(CRUDApiHandlerTest, HandleUpdateRequest_InValidFile_ReturnsNotFound) {
   EXPECT_EQ(response_.result(), http::status::not_found);
 }
 
-TEST_F(CRUDApiHandlerTest, HandleUpdateRequest_EmptyPath_ReturnsBadRequest) {
+TEST_F(CRUDApiHandlerTest, HandleUpdateRequest_EmptyPath_ReturnsNotFound) {
   // Create update request
   request_ = {boost::beast::http::verb::put,
               /*target=*/"", /*version=*/11};
   bool success = handler_->handle_request(request_, response_);
 
   EXPECT_FALSE(success);
-  EXPECT_EQ(response_.result(), http::status::bad_request);
+  EXPECT_EQ(response_.result(), http::status::not_found);
 }
 
 /*** DELETE tests ***/
@@ -264,14 +264,14 @@ TEST_F(CRUDApiHandlerTest, HandleDeleteRequest_InValidFile_ReturnsInternalServer
   EXPECT_EQ(response_.result(), http::status::internal_server_error);
 }
 
-TEST_F(CRUDApiHandlerTest, HandleDeleteRequest_EmptyPath_ReturnsBadRequest) {
+TEST_F(CRUDApiHandlerTest, HandleDeleteRequest_EmptyPath_ReturnsNotFound) {
   // Create delete request
   request_ = {boost::beast::http::verb::delete_,
               /*target=*/"", /*version=*/11};
   bool success = handler_->handle_request(request_, response_);
 
   EXPECT_FALSE(success);
-  EXPECT_EQ(response_.result(), http::status::bad_request);
+  EXPECT_EQ(response_.result(), http::status::not_found);
 }
 
 /*** RETRIEVE tests ***/
@@ -302,14 +302,14 @@ TEST_F(CRUDApiHandlerTest, HandleRetrieveRequest_NotValidFile_ReturnsNotFound) {
   EXPECT_EQ(response_.result(), http::status::not_found);
 }
 
-TEST_F(CRUDApiHandlerTest, HandleRetrieveRequest_EmptyPath_ReturnsBadRequest) {
+TEST_F(CRUDApiHandlerTest, HandleRetrieveRequest_EmptyPath_ReturnsNotFound) {
   // Create retrieve request
   request_ = {boost::beast::http::verb::get,
               /*target=*/"", /*version=*/11};
   bool success = handler_->handle_request(request_, response_);
 
   EXPECT_FALSE(success);
-  EXPECT_EQ(response_.result(), http::status::bad_request);
+  EXPECT_EQ(response_.result(), http::status::not_found);
 }
 
 /*** LIST tests ***/
@@ -342,12 +342,12 @@ TEST_F(CRUDApiHandlerTest, HandleListRequest_NotValidDir_ReturnsNotFound) {
   EXPECT_EQ(response_.result(), http::status::not_found);
 }
 
-TEST_F(CRUDApiHandlerTest, HandleListRequest_EmptyPath_ReturnsBadRequest) {
+TEST_F(CRUDApiHandlerTest, HandleListRequest_EmptyPath_ReturnsNotFound) {
   // Create list request
   request_ = {boost::beast::http::verb::get,
               /*target=*/"", /*version=*/11};
   bool success = handler_->handle_request(request_, response_);
 
   EXPECT_FALSE(success);
-  EXPECT_EQ(response_.result(), http::status::bad_request);
+  EXPECT_EQ(response_.result(), http::status::not_found);
 }

@@ -22,6 +22,11 @@ class BoostFileSystemIO : public FileSystemIOInterface {
   bool delete_file(std::string file_path) override;
 
   std::optional<std::vector<std::string>> ls(std::string dir_name) override;
+
+  // makes sure that the path is always in the appropriate style: leading ./,
+  // no trailing /, no double /
+  // special case: if empty, stays empty
+  std::string stylize_path(const std::string &path);
 };
 
 #endif

@@ -48,7 +48,7 @@ status CRUDApiHandler::handle_request(
       }
       else {
         BOOST_LOG_TRIVIAL(trace) << "GET request cannot be processed - invalid requested path.\n" << "Allowed requested path formats: '/api/Shoes' or '/api/Shoes/1'";
-        response.result(http::status::bad_request);
+        response.result(http::status::not_found);
         response.body() = "Unsupported HTTP verb provided: " +
                     http::to_string(req_method).to_string();
         status_ = false;
@@ -100,7 +100,7 @@ status CRUDApiHandler::handle_create_request(
   if (absolute_dir_path == "") {
     BOOST_LOG_TRIVIAL(error)
         << "Failed to generate absolute path with target :" << request.target();
-    response.result(http::status::bad_request);
+    response.result(http::status::not_found);
     return false;
   }
   BOOST_LOG_TRIVIAL(debug) << "absolute path: " << absolute_dir_path;
@@ -168,7 +168,7 @@ status CRUDApiHandler::handle_update_request(
         << request_path_ << " is not a prefix of "
         << request.target().to_string()
         << ". Cannot resolve to an absolute path on filesystem.";
-    response.result(http::status::bad_request);
+    response.result(http::status::not_found);
     return false;
   }
   // check if file exists
@@ -217,7 +217,7 @@ status CRUDApiHandler::handle_delete_request(
         << request_path_ << " is not a prefix of "
         << request.target().to_string()
         << ". Cannot resolve to an absolute path on filesystem.";
-    response.result(http::status::bad_request);
+    response.result(http::status::not_found);
     return false;
   }
 
@@ -241,7 +241,7 @@ status CRUDApiHandler::handle_retrieve_request(
         << request_path_ << " is not a prefix of "
         << request.target().to_string()
         << ". Cannot resolve to an absolute path on filesystem.";
-    response.result(http::status::bad_request);
+    response.result(http::status::not_found);
     return false;
   }
 
@@ -270,7 +270,7 @@ status CRUDApiHandler::handle_list_request(
         << request_path_ << " is not a prefix of "
         << request.target().to_string()
         << ". Cannot resolve to an absolute path on filesystem.";
-    response.result(http::status::bad_request);
+    response.result(http::status::not_found);
     return false;
   }
 
