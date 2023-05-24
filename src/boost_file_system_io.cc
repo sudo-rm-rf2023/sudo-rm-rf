@@ -26,8 +26,9 @@ bool BoostFileSystemIO::write_file(std::string file_path,
                                    const std::ostringstream &bytes) {
   fs::path boost_file_path(file_path);
 
-  std::ios_base::openmode flags = std::ios::binary | std::ios::trunc;
+  fs::create_directories(boost_file_path.parent_path());
 
+  std::ios_base::openmode flags = std::ios::binary | std::ios::trunc;
   fs::ofstream file_stream(boost_file_path, flags);
   if (!file_stream.is_open()) {
     BOOST_LOG_TRIVIAL(debug)

@@ -34,7 +34,7 @@ ENDCOLOR=$([ "$USE_COLOR" = "true" ] && echo "\e[0m" || echo "")
 
 # Configuration
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"  # Get the directory of this script
-TEST_CONFIG="${SCRIPT_DIR}/assign6_test.conf"
+TEST_CONFIG="${SCRIPT_DIR}/assign7_test.conf"
 SERVER_BINARY="$1"
 TEST_PORT=8080
 
@@ -89,6 +89,7 @@ kill "$SERVER_PID"
 
 # Remove the temporary files
 # rm -f ${SCRIPT_DIR}/integration/actual_*
+rm -rf ${SCRIPT_DIR}/mnt
 
 
 # Calculate and print pass rate

@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <vector>
+#include <algorithm>
 
 #include "config_utils.h"
 
@@ -94,7 +95,7 @@ status CRUDApiHandler::handle_create_request(
     http::response<http::string_body> &response) {
   BOOST_LOG_TRIVIAL(trace) << "handling create request";
 
-  int max_id = 1;  // IDs start at 1 for each entity
+  int max_id = 0;  // IDs start at 1 for each entity, 0 to account for increment
   std::string absolute_dir_path = create_absolute_file_path(request);
   if (absolute_dir_path == "") {
     BOOST_LOG_TRIVIAL(error)
@@ -124,6 +125,7 @@ status CRUDApiHandler::handle_create_request(
     BOOST_LOG_TRIVIAL(debug) << "No existing directory at requested path: \""
                              << absolute_dir_path << "\"";
   }
+  max_id++;
 
   std::string entity_file_path =
       absolute_dir_path + "/" + std::to_string(max_id);  // update the abs path
@@ -276,7 +278,8 @@ status CRUDApiHandler::handle_list_request(
       file_system_io_->ls(absolute_path);
   if (files.has_value()) {
     // Convert list of strings into a string with comma separated values
-    const std::vector<std::string> &data = files.value();
+    std::vector<std::string> &data = files.value();
+    std::sort(data.begin(), data.end());
     std::string responseBody = "[";
     for (size_t i = 0; i < data.size(); ++i) {
       responseBody += stripLeadingSlash(data[i]);
