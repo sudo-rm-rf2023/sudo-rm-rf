@@ -32,6 +32,8 @@ HandlerType GetHandlerTypeFromToken(std::string type_token) {
         return HandlerType::NOTFOUND_HANDLER;
     } else if (type_token == "CRUDApiHandler") {
         return HandlerType::CRUD_API_HANDLER;
+    } else if (type_token == "HealthRequestHandler") {
+        return HandlerType::HEALTH_REQUEST_HANDLER;
     } else {
         return HandlerType::UNDEFINED_HANDLER;
     }

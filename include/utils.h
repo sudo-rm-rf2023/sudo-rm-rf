@@ -24,6 +24,7 @@ enum HandlerType {
     STATIC_HANDLER = 2,
     NOTFOUND_HANDLER = 3,
     CRUD_API_HANDLER = 4,
+    HEALTH_REQUEST_HANDLER = 5
 };
 
 struct RouterEntry { // Deprecated
