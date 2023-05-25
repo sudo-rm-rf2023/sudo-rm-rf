@@ -34,6 +34,8 @@ HandlerType GetHandlerTypeFromToken(std::string type_token) {
         return HandlerType::CRUD_API_HANDLER;
     } else if (type_token == "HealthRequestHandler") {
         return HandlerType::HEALTH_REQUEST_HANDLER;
+    } else if (type_token == "BlockRequestHandler") {
+        return HandlerType::BLOCK_REQUEST_HANDLER;
     } else {
         return HandlerType::UNDEFINED_HANDLER;
     }
@@ -51,6 +53,11 @@ bool ValidateLocationBlock(NginxConfig location_config, HandlerType type){
         break;
     case CRUD_API_HANDLER:
         if(!config_util::getDataPathFromLocationConfig(location_config).has_value()){
+            return false;
+        }
+        break;
+    case BLOCK_REQUEST_HANDLER:
+        if(!config_util::getBlockTimeFromLocationConfig(location_config).has_value()){
             return false;
         }
         break;
@@ -112,6 +119,22 @@ std::optional<std::string> getDataPathFromLocationConfig(const NginxConfig &loca
     for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
         if (GetFirstTokenOfStatement(*statement) == "data_path" && StatementHasNTokens(*statement, 2)) {
             return GetNthTokenOfStatement(*statement, 2);
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<int> getBlockTimeFromLocationConfig(const NginxConfig &location_config) {
+    for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
+        if (GetFirstTokenOfStatement(*statement) == "sleep_time" && StatementHasNTokens(*statement, 2)) {
+            std::string block_time_token = GetNthTokenOfStatement(*statement, 2).value();
+            int block_time;
+            try {
+                block_time = std::stoi(block_time_token);
+                return block_time;
+            } catch (const std::exception &e) {
+                return std::nullopt;
+            }
         }
     }
     return std::nullopt;

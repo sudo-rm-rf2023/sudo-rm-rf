@@ -20,6 +20,8 @@ std::optional<std::string> getBaseDirFromLocationConfig(const NginxConfig &locat
 
 std::optional<std::string> getDataPathFromLocationConfig(const NginxConfig &location_config);
 
+std::optional<int> getBlockTimeFromLocationConfig(const NginxConfig &location_config);
+
 } // namespace config_util
 
 #endif
