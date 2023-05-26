@@ -28,7 +28,7 @@ void session::read_request() {
   http::async_read(socket_, buffer_, *request,
     [this, request](boost::beast::error_code ec, std::size_t bytes_transferred){
       if(!ec){
-        BOOST_LOG_TRIVIAL(info) << "Request from: " << socket_.remote_endpoint().address().to_string() << ":" << socket_.remote_endpoint().port();
+        BOOST_LOG_TRIVIAL(info) << REQUEST_IP << socket_.remote_endpoint().address().to_string() << ":" << socket_.remote_endpoint().port();
         // Create a shared pointer to the response object (lifetime managed by the session)
         std::shared_ptr<http::response<http::string_body>> response = std::make_shared<http::response<http::string_body>>();
         // generate error message if failed to generate response

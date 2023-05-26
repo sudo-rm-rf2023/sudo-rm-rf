@@ -18,7 +18,7 @@ BlockRequestHandler::BlockRequestHandler(const std::string& location, const Ngin
 status BlockRequestHandler::handle_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
-    BOOST_LOG_TRIVIAL(info) << "BlockRequestHandler::handle_request called";
+    BOOST_LOG_TRIVIAL(info) << MATCHED_HANDLER << "BlockRequestHandler";
     BOOST_LOG_TRIVIAL(info) << "blocking request sleeping for " << std::to_string(block_time_) << " seconds...";
     sleep(block_time_);
     response.version(request.version());
@@ -26,5 +26,6 @@ status BlockRequestHandler::handle_request(
     response.set(http::field::content_type, "text/plain");
     response.body() = "Blocking request complete";
     response.prepare_payload();
+    BOOST_LOG_TRIVIAL(info) << RESPONSE_CODE << response.result_int();
     return true;
 }

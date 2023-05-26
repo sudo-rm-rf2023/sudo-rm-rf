@@ -17,6 +17,13 @@ namespace expr = boost::log::expressions;
 namespace attrs = boost::log::attributes;
 namespace keywords = boost::log::keywords;
 
+const std::string RESPONSE_CODE = "ResponseCode: ";
+const std::string REQUEST_PATH = "RequestPath: ";
+const std::string REQUEST_METHOD = "RequestMethod: ";
+const std::string REQUEST_IP = "RequestIP: ";
+const std::string MATCHED_HANDLER = "MatchedHandler: ";
+
+
 void logger_init();
 
 #endif

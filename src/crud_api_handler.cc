@@ -26,8 +26,7 @@ status CRUDApiHandler::handle_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
   http::verb req_method = request.method();
-  BOOST_LOG_TRIVIAL(trace) << "Handling request to CRUDApiHandler. Method="
-                           << req_method;
+  BOOST_LOG_TRIVIAL(info) << MATCHED_HANDLER << "CRUDApiHandler";
 
   response.clear();
   response.version(11);
@@ -37,17 +36,17 @@ status CRUDApiHandler::handle_request(
   switch (req_method) {
     case http::verb::get:
       if (isFile(request.target().to_string())) {
-        BOOST_LOG_TRIVIAL(trace) << "Processing RETRIEVE request...";
+        BOOST_LOG_TRIVIAL(info) << "Processing RETRIEVE request...";
         status_ = handle_retrieve_request(request, response);
         break;
       }
       else if (isDirectory(request.target().to_string())) {
-        BOOST_LOG_TRIVIAL(trace) << "Processing LIST request...";
+        BOOST_LOG_TRIVIAL(info) << "Processing LIST request...";
         status_ = handle_list_request(request, response);
         break;
       }
       else {
-        BOOST_LOG_TRIVIAL(trace) << "GET request cannot be processed - invalid requested path.\n" << "Allowed requested path formats: '/api/Shoes' or '/api/Shoes/1'";
+        BOOST_LOG_TRIVIAL(info) << "GET request cannot be processed - invalid requested path.\n" << "Allowed requested path formats: '/api/Shoes' or '/api/Shoes/1'";
         response.result(http::status::not_found);
         response.body() = "Unsupported HTTP verb provided: " +
                     http::to_string(req_method).to_string();
@@ -55,19 +54,19 @@ status CRUDApiHandler::handle_request(
         break;
       }
     case http::verb::post:
-      BOOST_LOG_TRIVIAL(trace) << "Processing POST/CREATE request...";
+      BOOST_LOG_TRIVIAL(info) << "Processing POST/CREATE request...";
       status_ = handle_create_request(request, response);
       break;
     case http::verb::put:
-      BOOST_LOG_TRIVIAL(trace) << "Processing PUT/UPDATE request...";
+      BOOST_LOG_TRIVIAL(info) << "Processing PUT/UPDATE request...";
       status_ = handle_update_request(request, response);
       break;
     case http::verb::delete_:
-      BOOST_LOG_TRIVIAL(trace) << "Processing DELETE request...";
+      BOOST_LOG_TRIVIAL(info) << "Processing DELETE request...";
       status_ = handle_delete_request(request, response);
       break;
     default:
-      BOOST_LOG_TRIVIAL(trace)
+      BOOST_LOG_TRIVIAL(info)
           << "Processing unknown request: " << http::to_string(req_method);
       response.result(http::status::internal_server_error);
       response.body() = "Unsupported HTTP verb provided: " +
@@ -76,6 +75,8 @@ status CRUDApiHandler::handle_request(
   }
 
   response.prepare_payload();
+
+  BOOST_LOG_TRIVIAL(info) << RESPONSE_CODE << response.result_int();
   return status_;
 }
 
@@ -209,7 +210,7 @@ status CRUDApiHandler::handle_update_request(
 status CRUDApiHandler::handle_delete_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
-  BOOST_LOG_TRIVIAL(trace) << "Handling request for deleting...";
+  BOOST_LOG_TRIVIAL(trace) << "handling delete request";
 
   std::string absolute_path = create_absolute_file_path(request);
   if (absolute_path == "") {
@@ -233,7 +234,7 @@ status CRUDApiHandler::handle_delete_request(
 status CRUDApiHandler::handle_retrieve_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
-  BOOST_LOG_TRIVIAL(trace) << "Handling request for retrieve";
+  BOOST_LOG_TRIVIAL(trace) << "handling retrieve request";
 
   std::string absolute_path = create_absolute_file_path(request);
   if (absolute_path == "") {
@@ -254,7 +255,7 @@ status CRUDApiHandler::handle_retrieve_request(
     return true;
   } else {
     response.result(http::status::not_found);
-    BOOST_LOG_TRIVIAL(trace) << "Cannot retrieve object; not found.";
+    BOOST_LOG_TRIVIAL(trace) << "Cannot retrieve object";
     return false;
   }
 }
@@ -262,7 +263,7 @@ status CRUDApiHandler::handle_retrieve_request(
 status CRUDApiHandler::handle_list_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
-  BOOST_LOG_TRIVIAL(trace) << "Handling request for LIST...";
+  BOOST_LOG_TRIVIAL(trace) << "handling list request";
 
   std::string absolute_path = create_absolute_file_path(request);
   if (absolute_path == "") {
@@ -319,12 +320,9 @@ bool CRUDApiHandler::isDirectory(const std::string& target)
 
 std::string CRUDApiHandler::stripLeadingSlash(const std::string& str)
 {
-    if (!str.empty() && str[0] == '/')
-    {
+    if (!str.empty() && str[0] == '/'){
         return str.substr(1);
-    }
-    else
-    {
+    } else {
         return str;
     }
 }

@@ -46,8 +46,7 @@ status StaticRequestHandler::handle_request(
     int offset = request_path_.length();
     std::string requested_file = request.target().to_string().substr(offset);
     std::string file_path = *base_dir_ + requested_file;
-    BOOST_LOG_TRIVIAL(info) << "StaticRequestHandler::handle_request called";
-    BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();
+    BOOST_LOG_TRIVIAL(info) << MATCHED_HANDLER << "StaticRequestHandler";
     BOOST_LOG_TRIVIAL(info) << "file_path: " << file_path;
 
     if (!fs::exists(file_path) || !fs::is_regular_file(file_path)) {
@@ -85,6 +84,8 @@ status StaticRequestHandler::handle_request(
 
     // Prepare the response
     response.prepare_payload();
+
+    BOOST_LOG_TRIVIAL(info) << RESPONSE_CODE << response.result_int();
 
     return true; // Return 0 to indicate success
 }

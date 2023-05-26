@@ -58,6 +58,10 @@ status Dispatcher::assign_request(const http::request<http::string_body>& reques
     http::response<http::string_body>& response){
 
     std::string request_url = request.target().to_string();
+
+    BOOST_LOG_TRIVIAL(info) << REQUEST_PATH << request_url;
+    BOOST_LOG_TRIVIAL(info) << REQUEST_METHOD << request.method_string();
+
     RequestHandlerFactory* factory = match(request_url);
     if(factory == nullptr){
         return false;

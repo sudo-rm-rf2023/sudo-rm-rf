@@ -59,15 +59,16 @@ status EchoRequestHandler::handle_request(
     const http::request<http::string_body> &request,
     http::response<http::string_body> &response) {
 
-    BOOST_LOG_TRIVIAL(info) << "EchoRequestHandler::handle_request called";
-    BOOST_LOG_TRIVIAL(info) << "Request method: " << request.method_string();
+    BOOST_LOG_TRIVIAL(info) << MATCHED_HANDLER << "EchoRequestHandler";
 
     response.version(request.version());
     response.result(http::status::ok);
 
+    BOOST_LOG_TRIVIAL(info) << RESPONSE_CODE << response.result_int();
+
     response.body() = request_to_string(request);
     response.set(http::field::content_type, "text/plain");
     response.prepare_payload(); // set content-length
-    printf("Response Generated.\n");
+
     return true;
 }
