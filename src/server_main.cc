@@ -41,6 +41,9 @@ int main(int argc, char *argv[]) {
             BOOST_LOG_TRIVIAL(error) << "Invalid port configuration";
             return 1;
         }
+
+        unsigned int num_threads = config_util::getNumThreadsFromConfig(config).value_or(1); // Default to single threaded server if not set
+
         std::unordered_map<std::string, RequestHandlerFactory*> routes;
         if(!map_config_to_handler_factory(config, routes)){
             BOOST_LOG_TRIVIAL(error) << "Invalid handler configuration";
@@ -48,12 +51,11 @@ int main(int argc, char *argv[]) {
         }
         Dispatcher* dispatcher = new Dispatcher(routes);
 
-        server s(io_service, port.value(), dispatcher);
-        io_service.run();
+        server s(io_service, port.value(), dispatcher, num_threads);
+        s.run();
     } catch (std::exception &e) {
         BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what();
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Server shutting down";
     return 0;
 }

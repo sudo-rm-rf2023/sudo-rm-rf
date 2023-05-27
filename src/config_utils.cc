@@ -106,6 +106,24 @@ std::optional<int> getPortFromConfig(const NginxConfig &config) {
     return std::nullopt;
 }
 
+std::optional<unsigned int> getNumThreadsFromConfig(const NginxConfig &config)
+{
+    for (std::shared_ptr<NginxConfigStatement> statement : config.statements_) {
+        std::optional<std::string> first_token = GetFirstTokenOfStatement(*statement);
+        if ((first_token == "num_threads") && StatementHasNTokens(*statement, 2)) {
+            std::string num_threads_token = GetNthTokenOfStatement(*statement, 2).value();
+            unsigned int num_threads;
+            try {
+                num_threads = boost::numeric_cast<unsigned int>(std::stoi(num_threads_token));
+                return num_threads;
+            } catch (const std::exception &e) {
+                return std::nullopt;
+            }
+        }
+    }
+    return std::nullopt;
+}
+
 std::optional<std::string> getBaseDirFromLocationConfig(const NginxConfig &location_config) {
     for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
         if (GetFirstTokenOfStatement(*statement) == "root" && StatementHasNTokens(*statement, 2)) {

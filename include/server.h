@@ -18,12 +18,9 @@ using boost::asio::ip::tcp;
 
 class server {
 public:
-  server(boost::asio::io_service& io_service, int port, Dispatcher* dispatcher);
-  server(boost::asio::io_service& io_service, short port) // Deprecate this
-    : io_service_(io_service),
-      acceptor_(io_service, tcp::endpoint(tcp::v4(), port)){
-    start_accept();
-  }
+  server(boost::asio::io_service& io_service, int port, Dispatcher* dispatcher, unsigned int num_threads);
+
+  void run();
 private:
   void SetUpSignalHandlers();
   void start_accept();
@@ -32,6 +29,10 @@ private:
       const boost::system::error_code& error);
 
   void Stop(); // Gracefully exit
+
+  unsigned int num_threads_; // Number of worker threads to process the handlers
+
+  int port_;
 
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;

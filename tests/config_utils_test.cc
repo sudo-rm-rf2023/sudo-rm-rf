@@ -24,6 +24,12 @@ TEST_F(ConfigUtilsTest, GetPort){
     EXPECT_EQ(config_util::getPortFromConfig(config).value(), 9090);
 }
 
+TEST_F(ConfigUtilsTest, GetNumThreads){
+    ASSERT_TRUE(ParseFile("./test_configs/new_configs/simple_num_thread.conf"));
+    EXPECT_TRUE(config_util::validateConfig(config));
+    EXPECT_EQ(config_util::getNumThreadsFromConfig(config).value(), 20);
+}
+
 TEST_F(ConfigUtilsTest, GetPortInvalid){
     ASSERT_TRUE(ParseFile("./test_configs/new_configs/simple_port_invalid.conf"));
     EXPECT_FALSE(config_util::validateConfig(config));

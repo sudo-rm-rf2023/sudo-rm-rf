@@ -23,7 +23,9 @@ namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 // TODO: Write a module dedicated to process received request and produce a response
 class session {
 public:
-  session(boost::asio::io_service& io_service, Dispatcher* dispatcher) :socket_(io_service), dispatcher_(dispatcher) {}
+  session(boost::asio::io_service& io_service, Dispatcher* dispatcher) :socket_(io_service),
+                                                                        dispatcher_(dispatcher),
+                                                                        strand_(io_service) {}
 
   static session* makeSession(boost::asio::io_service& io_service, Dispatcher* dispatcher){
     return new session(io_service, dispatcher);
@@ -38,6 +40,10 @@ private:
   void reset();
 
   tcp::socket socket_;
+
+  // Strand to ensure the session's callback handlers functions are not called concurrently
+  // https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/doc/html/boost_asio/reference/io_service__strand.html
+  boost::asio::io_service::strand strand_;
 
   Dispatcher* dispatcher_;
 

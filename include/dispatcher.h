@@ -19,13 +19,13 @@ class Dispatcher {
         Dispatcher(const std::unordered_map<std::string, RequestHandlerFactory*>& routes) {routes_ = routes;}
         status assign_request(
             const http::request<http::string_body> &request,
-            http::response<http::string_body> &response);
+            http::response<http::string_body> &response) const;
         // generate 400 bad request
-        void handle_bad_request(http::response<http::string_body>& response);
+        void handle_bad_request(http::response<http::string_body>& response) const;
 
     private:
         std::unordered_map<std::string, RequestHandlerFactory*> routes_;
-        RequestHandlerFactory* match(const std::string& request_url);
+        RequestHandlerFactory* match(const std::string& request_url) const;
 };
 
 bool map_config_to_handler_factory(const NginxConfig &config, std::unordered_map<std::string, RequestHandlerFactory*> &routes);

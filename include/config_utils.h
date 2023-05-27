@@ -15,6 +15,7 @@ bool validateConfig(const NginxConfig &config);
 std::optional<std::vector<DispatcherEntry>> getDispatcherEntriesFromConfig(const NginxConfig &config);
 
 std::optional<int> getPortFromConfig(const NginxConfig &config);
+std::optional<unsigned int> getNumThreadsFromConfig(const NginxConfig &config);
 
 std::optional<std::string> getBaseDirFromLocationConfig(const NginxConfig &location_config);
 

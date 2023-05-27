@@ -35,7 +35,7 @@ RequestHandlerFactory* create_handler_factory(DispatcherEntry entry){
 
 // search if url is registered to a handler, else recersively search
 // the next longest url
-RequestHandlerFactory* Dispatcher::match(const std::string& request_url){
+RequestHandlerFactory* Dispatcher::match(const std::string& request_url) const{
     auto it = routes_.find(request_url);
     if (it != routes_.end()) {
         return it->second;
@@ -55,7 +55,7 @@ RequestHandlerFactory* Dispatcher::match(const std::string& request_url){
 }
 
 status Dispatcher::assign_request(const http::request<http::string_body>& request,
-    http::response<http::string_body>& response){
+    http::response<http::string_body>& response) const{
 
     std::string request_url = request.target().to_string();
 
@@ -87,7 +87,7 @@ status Dispatcher::assign_request(const http::request<http::string_body>& reques
     return true;
 }
 
-void Dispatcher::handle_bad_request(http::response<http::string_body>& response){
+void Dispatcher::handle_bad_request(http::response<http::string_body>& response) const{
     response.result(http::status::bad_request);
     response.set(http::field::content_type, "text/plain");
     response.body() = "Invalid Request";

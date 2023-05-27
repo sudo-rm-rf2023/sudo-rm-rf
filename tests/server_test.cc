@@ -20,7 +20,7 @@ protected:
 TEST_F(serverTest, ConstructServer) {
     //TODO: make the port not hardcoded
     dispatcher = new Dispatcher(routes);
-    test_server = new server(io_service, 80, dispatcher);
+    test_server = new server(io_service, 80, dispatcher, /*num_thread=*/5);
     using namespace std::chrono_literals;
     boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address_v4::loopback(), 80);
     boost::asio::ip::tcp::socket socket(io_service);

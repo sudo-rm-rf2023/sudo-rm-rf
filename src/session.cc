@@ -25,7 +25,8 @@ void session::read_request() {
 
   std::shared_ptr<http::request<http::string_body>> request = std::make_shared<http::request<http::string_body>>();
 
-  http::async_read(socket_, buffer_, *request,
+  // TODO(yiyangzhou123): don't capture shared_ptr in lambda: memory leak
+  http::async_read(socket_, buffer_, *request, strand_.wrap(
     [this, request](boost::beast::error_code ec, std::size_t bytes_transferred){
       if(!ec){
         BOOST_LOG_TRIVIAL(info) << REQUEST_IP << socket_.remote_endpoint().address().to_string() << ":" << socket_.remote_endpoint().port();
@@ -52,7 +53,7 @@ void session::read_request() {
         delete this;
         return;
       }
-    });
+    }));
 }
 
 void session::reset() {
@@ -61,10 +62,10 @@ void session::reset() {
 
 // Write response to socket
 void session::write_response(const std::shared_ptr<http::response<http::string_body>>& response){
-  http::async_write(socket_, *response,
-    // wrap response in a lambda function to keep it alive
+  http::async_write(socket_, *response, strand_.wrap(
+    // wrap response in a lambda function to keep it alive (TODO(yiyangzhou123): don't do this)
     [this, response](boost::beast::error_code ec, std::size_t byte_transferred){
       this->reset();
-    });
+    }));
 }
 
