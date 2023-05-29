@@ -20,7 +20,7 @@ FROM ubuntu:jammy as deploy
 # Copy server output binary to "."
 COPY --from=builder /usr/src/projects/sudo-rm-rf/build/bin/server .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/localrun.conf .
-COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/assign7.conf .
+COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/assign8.conf .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/static ./static
 
 # Expose some port(s)
@@ -32,4 +32,4 @@ ENTRYPOINT ["./server"]
 
 # Use CMD to specify arguments to ENTRYPOINT
 # Update with real server args
-CMD ["assign7.conf"]
+CMD ["assign8.conf"]
