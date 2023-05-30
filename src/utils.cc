@@ -32,3 +32,27 @@ std::string mime_type(const std::string& path) {
     return "application/octet-stream";
 }
 
+namespace util {
+
+std::vector<std::string> parseURL(const std::string &url)
+{
+    std::vector<std::string> parsed_url_tokens;
+    std::size_t slash_pos = url.find("/");
+    while (slash_pos != std::string::npos){
+        std::size_t next_slash_pos = url.find("/", slash_pos + 1);
+        std::string new_token;
+        if (next_slash_pos == std::string::npos){
+            new_token = url.substr(slash_pos + 1);
+        } else {
+            size_t token_length = next_slash_pos - slash_pos - 1;
+            new_token = url.substr(slash_pos + 1, token_length);
+        }
+        if (!new_token.empty()){
+            parsed_url_tokens.push_back(new_token);
+        }
+        slash_pos = next_slash_pos;
+    }
+    return parsed_url_tokens;
+}
+
+} // namespace util

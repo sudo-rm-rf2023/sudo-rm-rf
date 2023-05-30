@@ -23,10 +23,6 @@ class BoostFileSystemIO : public FileSystemIOInterface {
 
   std::optional<std::vector<std::string>> ls(std::string dir_name) override;
 
-  // makes sure that the path is always in the appropriate style: leading ./,
-  // no trailing /, no double /
-  // special case: if empty, stays empty
-  std::string stylize_path(const std::string &path);
 };
 
 #endif

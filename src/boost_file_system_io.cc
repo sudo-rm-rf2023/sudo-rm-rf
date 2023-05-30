@@ -3,7 +3,6 @@
 #include <regex>
 std::optional<std::ostringstream> BoostFileSystemIO::read_file(
     std::string file_path) {
-  file_path = stylize_path(file_path);
   fs::path boost_file_path(file_path);
   if (!fs::exists(boost_file_path) || !fs::is_regular_file(boost_file_path)) {
     BOOST_LOG_TRIVIAL(debug) << "Cannot open file: " << file_path
@@ -26,7 +25,6 @@ std::optional<std::ostringstream> BoostFileSystemIO::read_file(
 
 bool BoostFileSystemIO::write_file(std::string file_path,
                                    const std::ostringstream &bytes) {
-  file_path = stylize_path(file_path);
   fs::path boost_file_path(file_path);
   try {
     fs::create_directories(boost_file_path.parent_path());
@@ -49,7 +47,6 @@ bool BoostFileSystemIO::write_file(std::string file_path,
 }
 
 bool BoostFileSystemIO::delete_file(std::string file_path) {
-  file_path = stylize_path(file_path);
   fs::path boost_file_path(file_path);
   if (!fs::exists(boost_file_path)) {
     BOOST_LOG_TRIVIAL(debug)
@@ -69,7 +66,6 @@ bool BoostFileSystemIO::delete_file(std::string file_path) {
 
 std::optional<std::vector<std::string>> BoostFileSystemIO::ls(
     std::string dir_name) {
-  dir_name = stylize_path(dir_name);
   BOOST_LOG_TRIVIAL(trace) << "LS : " << dir_name;
   fs::path dir_path(dir_name);
   if (!fs::exists(dir_path) || !fs::is_directory(dir_path)) {
@@ -87,22 +83,3 @@ std::optional<std::vector<std::string>> BoostFileSystemIO::ls(
 
   return file_names;
 }
-
-std::string BoostFileSystemIO::stylize_path(const std::string &path) {
-  if (path == "") {
-    return "";
-  }
-  // ensure all paths are seperated by only one '/'
-  std::regex regex("//+");
-  // ensure path begins with '/'
-  std::string result = "./" + path;
-  result = std::regex_replace(result, regex, "/");
-  // remove any trailing '/'
-  size_t last_non_slash = result.find_last_not_of('/');
-  if (last_non_slash != std::string::npos) {
-    result = result.substr(0, last_non_slash + 1);
-  }
-  BOOST_LOG_TRIVIAL(info) << "stylized \"" << path << "\" to \"" << result
-                          << "\"";
-  return result;
-};

@@ -57,30 +57,19 @@ class CRUDApiHandler : public RequestHandler {
   status handle_list_request(const http::request<http::string_body> &request,
                              http::response<http::string_body> &response);
 
-  /*
-   * API: returns an absolute file path when given an http request. If not a
-   * valid path, return an empty string.
-   */
-  std::string create_absolute_file_path(
-      const http::request<http::string_body> &request);
+  std::optional<std::string> validateAndGetEntityDir(const std::string &url);
+
+  std::optional<std::string> validateAndGetEntityFile(const std::string &url);
 
   std::string formatJsonObject(const std::string &label,
                                const std::string &value);
-
-  /**
-   * API: returns a bool to determine if a requested path points to a file depending on the number of slashes. This assumes we know the structure of paths and it will not vary.
-   */
-  bool isFile(const std::string& target);
-
-  /**
-   * API: returns a bool to determine if a requested path points to a directory depending on the number of slashes. This assumes we know the structure of paths and it will not vary.
-   */
-  bool isDirectory(const std::string& target);
 
   /*
   * API: strips the leading slash if one exists and returns a string
   */
   std::string stripLeadingSlash(const std::string& str);
+
+  bool FileExists(const std::string& path); // Helper function: Check if file exists
 
   std::shared_ptr<FileSystemIOInterface> file_system_io_;
   std::string request_path_;

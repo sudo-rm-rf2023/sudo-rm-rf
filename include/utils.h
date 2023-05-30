@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include "config_parser.h"
+#include <optional>
 
 const std::string CONFIG_KW_SERVER = std::string("server");
 const std::string CONFIG_KW_LISTEN = std::string("listen");
@@ -45,4 +46,10 @@ struct DispatcherEntry {
 // A helper function that returns the corresponding mime_type given the request_path
 std::string mime_type(const std::string& path);
 
+namespace util {
+
+// Parse urls into string tokens
+// e.g /api/path//hello/world/ => ["api", "path", "hello", "world"]
+std::vector<std::string> parseURL(const std::string& url);
+} // namespace util
 #endif
