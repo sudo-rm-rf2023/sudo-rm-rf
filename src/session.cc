@@ -22,33 +22,26 @@ void session::start() {
 
 // read request by http::async_read
 void session::read_request() {
-
-  std::shared_ptr<http::request<http::string_body>> request = std::make_shared<http::request<http::string_body>>();
-
-  // TODO(yiyangzhou123): don't capture shared_ptr in lambda: memory leak
-  http::async_read(socket_, buffer_, *request, strand_.wrap(
-    [this, request](boost::beast::error_code ec, std::size_t bytes_transferred){
+  http::async_read(socket_, buffer_, request_, strand_.wrap(
+    [this](boost::beast::error_code ec, std::size_t bytes_transferred){
       if(!ec){
         BOOST_LOG_TRIVIAL(info) << REQUEST_IP << socket_.remote_endpoint().address().to_string() << ":" << socket_.remote_endpoint().port();
-        // Create a shared pointer to the response object (lifetime managed by the session)
-        std::shared_ptr<http::response<http::string_body>> response = std::make_shared<http::response<http::string_body>>();
         // generate error message if failed to generate response
-        if(!dispatcher_->assign_request(*request, *response)){
+        if(!dispatcher_->assign_request(request_, response_)){
           BOOST_LOG_TRIVIAL(error) << "Failed to generate response.";
-          http::status status = http::status::internal_server_error;
-          response->result(status);
+          response_.result(http::status::internal_server_error);
         }
-        write_response(response);
+        write_response();
       }else{
-        // Check if the error is caused by a bad request
         if (ec == http::error::bad_target) {
           BOOST_LOG_TRIVIAL(error) << "Bad request";
           // Send a 400 Bad Request response
-          std::shared_ptr<http::response<http::string_body>> response = std::make_shared<http::response<http::string_body>>();
-          dispatcher_->handle_bad_request(*response);
-          http::write(socket_, *response); //TODO: refactor session class
+          dispatcher_->handle_bad_request(response_);
+          http::write(socket_, response_);
+        } else if (ec == http::error::end_of_stream) {
+          BOOST_LOG_TRIVIAL(info) << "End of Stream received. The Client may have closed the connection.";
         } else {
-          fprintf(stderr, "Error in async_read (I/O): %s\n", ec.message().c_str());
+          BOOST_LOG_TRIVIAL(error) << "Error in async_read (I/O): " << ec.message();
         }
         delete this;
         return;
@@ -57,14 +50,15 @@ void session::read_request() {
 }
 
 void session::reset() {
+  request_.clear();
+  response_.clear();
   read_request();
 }
 
 // Write response to socket
-void session::write_response(const std::shared_ptr<http::response<http::string_body>>& response){
-  http::async_write(socket_, *response, strand_.wrap(
-    // wrap response in a lambda function to keep it alive (TODO(yiyangzhou123): don't do this)
-    [this, response](boost::beast::error_code ec, std::size_t byte_transferred){
+void session::write_response(){
+  http::async_write(socket_, response_, strand_.wrap(
+    [this](boost::beast::error_code ec, std::size_t byte_transferred){
       this->reset();
     }));
 }

@@ -36,7 +36,7 @@ public:
 
 private:
   void read_request();
-  void write_response(const std::shared_ptr<http::response<http::string_body>>& response);
+  void write_response();
   void reset();
 
   tcp::socket socket_;
@@ -44,6 +44,9 @@ private:
   // Strand to ensure the session's callback handlers functions are not called concurrently
   // https://valelab4.ucsf.edu/svn/3rdpartypublic/boost/doc/html/boost_asio/reference/io_service__strand.html
   boost::asio::io_service::strand strand_;
+
+  http::request<http::string_body> request_;
+  http::response<http::string_body> response_;
 
   Dispatcher* dispatcher_;
 
