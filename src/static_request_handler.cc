@@ -49,6 +49,11 @@ status StaticRequestHandler::handle_request(
     BOOST_LOG_TRIVIAL(info) << MATCHED_HANDLER << "StaticRequestHandler";
     BOOST_LOG_TRIVIAL(info) << "file_path: " << file_path;
 
+    // if file_path is a directory, append index.html
+    if (fs::is_directory(file_path)) {
+        file_path += "/index.html";
+    }
+
     if (!fs::exists(file_path) || !fs::is_regular_file(file_path)) {
         BOOST_LOG_TRIVIAL(info) << "File not found";
         response.result(http::status::not_found);
