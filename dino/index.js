@@ -99,6 +99,20 @@
     var IS_TOUCH_ENABLED = 'ontouchstart' in window;
 
     /**
+     * URL for uploading score
+     * TODO(yunqiu21): Replace with actual /newscore path
+     * @const
+     */
+    var UPLOAD_SCORE_URL = 'http://34.132.52.131/api/game';
+
+    /**
+     * URL for viewing leaderboard
+     * TODO(yunqiu21): Replace with actual /leaderboard path
+     * @const
+     */
+    var VIEW_LEADERBOARD_URL = 'http://34.132.52.131/api/game';
+
+    /**
      * Default game configuration.
      * @enum {number}
      */
@@ -429,7 +443,7 @@
             if (this.activated) {
                 this.setArcadeModeContainerScale();
             }
-            
+
             // Redraw the elements back onto the canvas.
             if (this.canvas) {
                 this.canvas.width = this.dimensions.WIDTH;
@@ -474,9 +488,9 @@
                     'from { width:' + Trex.config.WIDTH + 'px }' +
                     'to { width: ' + this.dimensions.WIDTH + 'px }' +
                     '}';
-                
-                // create a style sheet to put the keyframe rule in 
-                // and then place the style sheet in the html head    
+
+                // create a style sheet to put the keyframe rule in
+                // and then place the style sheet in the html head
                 var sheet = document.createElement('style');
                 sheet.innerHTML = keyframes;
                 document.head.appendChild(sheet);
@@ -782,25 +796,126 @@
             vibrate(200);
 
             this.stop();
+            this.stopListening();
             this.crashed = true;
             this.distanceMeter.acheivement = false;
 
             this.tRex.update(100, Trex.status.CRASHED);
-
-            // Game over panel.
-            if (!this.gameOverPanel) {
-                this.gameOverPanel = new GameOverPanel(this.canvas,
-                    this.spriteDef.TEXT_SPRITE, this.spriteDef.RESTART,
-                    this.dimensions);
-            } else {
-                this.gameOverPanel.draw();
-            }
 
             // Update the high score.
             if (this.distanceRan > this.highestScore) {
                 this.highestScore = Math.ceil(this.distanceRan);
                 this.distanceMeter.setHighScore(this.highestScore);
             }
+
+            // TODO(yunqiu21): Refactor the pop-up window into a separate function.
+            // Create pop-up div
+            var popupDiv = document.createElement("div");
+
+            popupDiv.style.width = "400px";
+            popupDiv.style.height = "300px";
+            popupDiv.style.backgroundColor = "white";
+            popupDiv.style.border = "2px solid #888";
+            popupDiv.style.position = "fixed";
+            popupDiv.style.top = "50%";
+            popupDiv.style.left = "50%";
+            popupDiv.style.padding = "15px 0";
+            popupDiv.style.transform = "translate(-50%, -50%)";
+            popupDiv.style.display = "flex";
+            popupDiv.style.flexDirection = "column";
+            popupDiv.style.zIndex = "2";
+
+            // Create username input field
+            var usernameInput = document.createElement("input");
+            usernameInput.type = "text";
+            usernameInput.placeholder = "Enter a username";
+            usernameInput.style.border = "1px solid #888";
+            usernameInput.style.margin = "auto";
+            usernameInput.style.padding = "10px 18px";
+            usernameInput.style.width = "70%";
+            usernameInput.style.height = "12%";
+            usernameInput.style.fontSize = "20px";
+
+            // Create upload score button
+            var uploadScoreButton = document.createElement("button");
+            uploadScoreButton.textContent = "Upload Score";
+            uploadScoreButton.style.margin = "auto";
+            uploadScoreButton.style.width = "80%";
+            uploadScoreButton.style.height = "15%";
+            uploadScoreButton.style.fontSize = "20px";
+            uploadScoreButton.onclick = () => {
+                if (!usernameInput.value) {
+                    alert("Must enter a username!");
+                } else {
+                    var data = {
+                        name: usernameInput.value,
+                        score: this.distanceMeter.getActualDistance(Math.ceil(this.distanceRan))
+                    };
+
+                    // Send a POST request
+                    fetch(UPLOAD_SCORE_URL, {
+                        mode: 'no-cors',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    // TODO(yunqiu21): Enable CORS on server side so that response can be received
+                    .then(function(response) {
+                        // Request was made, but response data is restricted
+                        console.log('Request made, but response is restricted');
+                    })
+                    // TODO(yunqiu21): Uncomment this to check response
+                    // .then(function(response) {
+                    //     if (response.ok) {
+                    //         // Request was successful
+                    //         return response.text();
+                    //     } else {
+                    //         // Request failed
+                    //         throw new Error('Request failed. Status:', response.status);
+                    //     }
+                    // })
+                    // .then(function(data) {
+                    //     console.log(data);
+                    // })
+                    .catch(function(error) {
+                        console.error('Request error:', error);
+                    });
+                }
+            }
+
+            // Create view leaderboard button
+            var viewLeaderboardButton = document.createElement("button");
+            viewLeaderboardButton.textContent = "View Leaderboard";
+            viewLeaderboardButton.style.margin = "auto";
+            viewLeaderboardButton.style.width = "80%";
+            viewLeaderboardButton.style.height = "15%";
+            viewLeaderboardButton.style.fontSize = "20px";
+            viewLeaderboardButton.onclick = () => {
+                window.open(VIEW_LEADERBOARD_URL);
+            }
+
+            // Create restart button
+            var restartButton = document.createElement("button");
+            restartButton.textContent = "Restart";
+            restartButton.style.margin = "auto";
+            restartButton.style.width = "80%";
+            restartButton.style.height = "15%";
+            restartButton.style.fontSize = "20px";
+            restartButton.onclick = () => {
+                popupDiv.remove();
+                this.restart();
+            }
+
+            // Append input and buttons to div
+            popupDiv.appendChild(usernameInput);
+            popupDiv.appendChild(uploadScoreButton);
+            popupDiv.appendChild(viewLeaderboardButton);
+            popupDiv.appendChild(restartButton);
+
+            // Append div to the document body
+            document.body.appendChild(popupDiv);
 
             // Reset the time clock.
             this.time = getTimeStamp();
@@ -842,7 +957,7 @@
                 this.update();
             }
         },
-        
+
         /**
          * Hides offline messaging for a fullscreen game only experience.
          */
@@ -871,7 +986,7 @@
             this.containerEl.style.transform =
                 'scale(' + cssScale + ') translateY(' + translateY + 'px)';
         },
-        
+
         /**
          * Pause the game if the tab is not in focus.
          */
