@@ -22,6 +22,7 @@ COPY --from=builder /usr/src/projects/sudo-rm-rf/build/bin/server .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/localrun.conf .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/assign9.conf .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/static ./static
+COPY --from=builder /usr/src/projects/sudo-rm-rf/dino ./dino
 
 # Expose some port(s)
 EXPOSE 80
