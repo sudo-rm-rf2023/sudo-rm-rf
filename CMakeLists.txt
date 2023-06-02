@@ -27,6 +27,9 @@ enable_testing()
 include(GoogleTest)
 add_subdirectory(/usr/src/googletest googletest)
 
+# Enable JsonCpp
+find_package(jsoncpp)
+
 # Enable Boost
 # Use static libraries so binaries can be deployed without a full boost install
 set(Boost_USE_STATIC_LIBS ON)
@@ -52,6 +55,7 @@ add_library(utils_lib src/utils.cc)
 add_library(config_utils_lib src/config_utils.cc)
 add_library(dispatcher_lib src/dispatcher.cc)
 add_library(boost_file_system_io_lib src/boost_file_system_io.cc)
+add_library(score_util_lib src/score_util.cc)
 
 # Deprecated libraries
 add_library(config_manager_lib legacy/src/config_manager.cc)
@@ -76,6 +80,7 @@ target_link_libraries(health_request_handler_lib logger_lib)
 target_link_libraries(block_request_handler_lib logger_lib config_utils_lib)
 target_link_libraries(utils_lib config_parser_lib)
 target_link_libraries(boost_file_system_io_lib logger_lib)
+target_link_libraries(score_util_lib jsoncpp_lib logger_lib)
 
 # main
 add_executable(server src/server_main.cc)
@@ -165,13 +170,19 @@ add_executable(utils_test tests/utils_test.cc)
 target_link_libraries(utils_test utils_lib gtest_main)
 gtest_discover_tests(utils_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# score_util test
+add_executable(score_util_test tests/score_util_test.cc)
+target_link_libraries(score_util_test score_util_lib gtest_main)
+gtest_discover_tests(score_util_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
 # Coverage target/test targets
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
         server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib health_request_handler_lib block_request_handler_lib
         static_handler_lib not_found_handler_lib crud_api_handler_lib router_lib config_utils_lib dispatcher_lib boost_file_system_io_lib utils_lib
+        score_util_lib
     TESTS 
         config_parser_test config_manager_test server_test session_test echo_request_handler_test health_request_handler_test block_request_handler_test
         static_request_handler_test not_found_handler_test crud_api_handler_test router_test config_utils_test dispatcher_test boost_file_system_io_test
-        utils_test)
+        utils_test score_util_test)
