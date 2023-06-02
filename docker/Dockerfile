@@ -9,8 +9,22 @@ WORKDIR /usr/src/projects/sudo-rm-rf/build
 # Build and test
 RUN cmake ..
 RUN make
-
 RUN ctest --output-on_failure
+
+
+### Obfuscation container ###
+FROM node:14 as obfuscator
+
+WORKDIR /app
+
+# Install javascript-obfuscator
+RUN npm install --global javascript-obfuscator
+
+# Copy all necessary files from the builder stage
+COPY --from=builder /usr/src/projects/sudo-rm-rf/dino ./dino
+
+# Obfuscate your JavaScript files
+RUN find ./dino -name "*.js" -exec javascript-obfuscator {} --output {} \;
 
 
 ### Deploy container ###
@@ -21,8 +35,12 @@ FROM ubuntu:jammy as deploy
 COPY --from=builder /usr/src/projects/sudo-rm-rf/build/bin/server .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/localrun.conf .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/assign9.conf .
+
+# Copy all necessary files from the obfuscator stage
+COPY --from=obfuscator /app/dino ./dino
+
+# Copy static files
 COPY --from=builder /usr/src/projects/sudo-rm-rf/static ./static
-COPY --from=builder /usr/src/projects/sudo-rm-rf/dino ./dino
 
 # Expose some port(s)
 EXPOSE 80
