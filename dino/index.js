@@ -36,6 +36,7 @@
         this.distanceRan = 0;
 
         this.highestScore = 0;
+        this.scoreUploaded = false;
 
         this.time = 0;
         this.runningTime = 0;
@@ -103,14 +104,14 @@
      * TODO(yunqiu21): Replace with actual /newscore path
      * @const
      */
-    var UPLOAD_SCORE_URL = 'http://34.132.52.131/api/game';
+    var UPLOAD_SCORE_URL = '/api/game';
 
     /**
      * URL for viewing leaderboard
      * TODO(yunqiu21): Replace with actual /leaderboard path
      * @const
      */
-    var VIEW_LEADERBOARD_URL = 'http://34.132.52.131/api/game';
+    var VIEW_LEADERBOARD_URL = '/api/game';
 
     /**
      * Default game configuration.
@@ -166,7 +167,8 @@
         INVERTED: 'inverted',
         SNACKBAR: 'snackbar',
         SNACKBAR_SHOW: 'snackbar-show',
-        TOUCH_CONTROLLER: 'controller'
+        TOUCH_CONTROLLER: 'controller',
+        GAMEOVER: 'game-over'
     };
 
 
@@ -808,45 +810,34 @@
                 this.distanceMeter.setHighScore(this.highestScore);
             }
 
-            // TODO(yunqiu21): Refactor the pop-up window into a separate function.
-            // Create pop-up div
-            var popupDiv = document.createElement("div");
+            // Create popup window.
+            this.popup();
 
-            popupDiv.style.width = "400px";
-            popupDiv.style.height = "300px";
-            popupDiv.style.backgroundColor = "white";
-            popupDiv.style.border = "2px solid #888";
-            popupDiv.style.position = "fixed";
-            popupDiv.style.top = "50%";
-            popupDiv.style.left = "50%";
-            popupDiv.style.padding = "15px 0";
-            popupDiv.style.transform = "translate(-50%, -50%)";
-            popupDiv.style.display = "flex";
-            popupDiv.style.flexDirection = "column";
-            popupDiv.style.zIndex = "2";
+            // Reset the time clock.
+            this.time = getTimeStamp();
+        },
+
+        popup: function () {
+            var popupDiv = document.createElement("div");
+            popupDiv.className = Runner.classes.GAMEOVER;
 
             // Create username input field
             var usernameInput = document.createElement("input");
             usernameInput.type = "text";
             usernameInput.placeholder = "Enter a username";
-            usernameInput.style.border = "1px solid #888";
-            usernameInput.style.margin = "auto";
-            usernameInput.style.padding = "10px 18px";
-            usernameInput.style.width = "70%";
-            usernameInput.style.height = "12%";
-            usernameInput.style.fontSize = "20px";
+            usernameInput.className = Runner.classes.GAMEOVER;
 
             // Create upload score button
             var uploadScoreButton = document.createElement("button");
             uploadScoreButton.textContent = "Upload Score";
-            uploadScoreButton.style.margin = "auto";
-            uploadScoreButton.style.width = "80%";
-            uploadScoreButton.style.height = "15%";
-            uploadScoreButton.style.fontSize = "20px";
+            uploadScoreButton.className = Runner.classes.GAMEOVER;
             uploadScoreButton.onclick = () => {
                 if (!usernameInput.value) {
                     alert("Must enter a username!");
+                } else if (this.scoreUploaded) {
+                    alert("You have already uploaded this score.");
                 } else {
+                    this.scoreUploaded = true;
                     var data = {
                         name: usernameInput.value,
                         score: this.distanceMeter.getActualDistance(Math.ceil(this.distanceRan))
@@ -888,10 +879,7 @@
             // Create view leaderboard button
             var viewLeaderboardButton = document.createElement("button");
             viewLeaderboardButton.textContent = "View Leaderboard";
-            viewLeaderboardButton.style.margin = "auto";
-            viewLeaderboardButton.style.width = "80%";
-            viewLeaderboardButton.style.height = "15%";
-            viewLeaderboardButton.style.fontSize = "20px";
+            viewLeaderboardButton.className = Runner.classes.GAMEOVER;
             viewLeaderboardButton.onclick = () => {
                 window.open(VIEW_LEADERBOARD_URL);
             }
@@ -899,10 +887,7 @@
             // Create restart button
             var restartButton = document.createElement("button");
             restartButton.textContent = "Restart";
-            restartButton.style.margin = "auto";
-            restartButton.style.width = "80%";
-            restartButton.style.height = "15%";
-            restartButton.style.fontSize = "20px";
+            restartButton.className = Runner.classes.GAMEOVER;
             restartButton.onclick = () => {
                 popupDiv.remove();
                 this.restart();
@@ -916,9 +901,6 @@
 
             // Append div to the document body
             document.body.appendChild(popupDiv);
-
-            // Reset the time clock.
-            this.time = getTimeStamp();
         },
 
         stop: function () {
@@ -940,6 +922,8 @@
 
         restart: function () {
             if (!this.raqId) {
+                this.startListening();
+                this.scoreUploaded = false;
                 this.playCount++;
                 this.runningTime = 0;
                 this.playing = true;
