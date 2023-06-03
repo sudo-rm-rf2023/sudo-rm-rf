@@ -51,7 +51,9 @@ void session::read_request() {
 
 void session::reset() {
   request_.clear();
+  request_.body().clear();
   response_.clear();
+  response_.body().clear();
   read_request();
 }
 

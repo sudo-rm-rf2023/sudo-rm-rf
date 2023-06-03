@@ -18,6 +18,9 @@ std::optional<int> getPortFromConfig(const NginxConfig &config);
 std::optional<unsigned int> getNumThreadsFromConfig(const NginxConfig &config);
 
 std::optional<std::string> getBaseDirFromLocationConfig(const NginxConfig &location_config);
+std::optional<std::string> getLeaderboardFileFromLocationConfig(const NginxConfig &location_config);
+std::optional<std::string> getScoreStorageFromLocationConfig(const NginxConfig &location_config);
+std::optional<unsigned short> getRankingSizeFromLocationConfig(const NginxConfig &location_config);
 
 std::optional<std::string> getDataPathFromLocationConfig(const NginxConfig &location_config);
 

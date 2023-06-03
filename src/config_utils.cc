@@ -36,6 +36,8 @@ HandlerType GetHandlerTypeFromToken(std::string type_token) {
         return HandlerType::HEALTH_REQUEST_HANDLER;
     } else if (type_token == "BlockRequestHandler") {
         return HandlerType::BLOCK_REQUEST_HANDLER;
+    } else if (type_token == "ScoreRequestHandler"){
+        return HandlerType::SCORE_REQUEST_HANDLER;
     } else {
         return HandlerType::UNDEFINED_HANDLER;
     }
@@ -58,6 +60,12 @@ bool ValidateLocationBlock(NginxConfig location_config, HandlerType type){
         break;
     case BLOCK_REQUEST_HANDLER:
         if(!config_util::getBlockTimeFromLocationConfig(location_config).has_value()){
+            return false;
+        }
+        break;
+    case SCORE_REQUEST_HANDLER:
+        if(!config_util::getLeaderboardFileFromLocationConfig(location_config).has_value() ||
+            !config_util::getScoreStorageFromLocationConfig(location_config).has_value()){
             return false;
         }
         break;
@@ -142,6 +150,24 @@ std::optional<std::string> getDataPathFromLocationConfig(const NginxConfig &loca
     return std::nullopt;
 }
 
+std::optional<std::string> getLeaderboardFileFromLocationConfig(const NginxConfig &location_config) {
+    for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
+        if (GetFirstTokenOfStatement(*statement) == "leaderboard_file" && StatementHasNTokens(*statement, 2)) {
+            return GetNthTokenOfStatement(*statement, 2);
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> getScoreStorageFromLocationConfig(const NginxConfig &location_config) {
+    for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
+        if (GetFirstTokenOfStatement(*statement) == "score_storage" && StatementHasNTokens(*statement, 2)) {
+            return GetNthTokenOfStatement(*statement, 2);
+        }
+    }
+    return std::nullopt;
+}
+
 std::optional<int> getBlockTimeFromLocationConfig(const NginxConfig &location_config) {
     for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
         if (GetFirstTokenOfStatement(*statement) == "sleep_time" && StatementHasNTokens(*statement, 2)) {
@@ -157,6 +183,23 @@ std::optional<int> getBlockTimeFromLocationConfig(const NginxConfig &location_co
     }
     return std::nullopt;
 }
+
+std::optional<unsigned short> getRankingSizeFromLocationConfig(const NginxConfig &location_config) {
+    for (std::shared_ptr<NginxConfigStatement> statement : location_config.statements_) {
+        if (GetFirstTokenOfStatement(*statement) == "leaderboard_size" && StatementHasNTokens(*statement, 2)) {
+            std::string leaderboard_size_token = GetNthTokenOfStatement(*statement, 2).value();
+            unsigned short size;
+            try {
+                size = boost::numeric_cast<unsigned short>(std::stoi(leaderboard_size_token));
+                return size;
+            } catch (const std::exception &e) {
+                return std::nullopt;
+            }
+        }
+    }
+    return std::nullopt;
+}
+
 
 bool validateConfig(const NginxConfig &config){
     if(!getPortFromConfig(config).has_value()){ // Must have port statement

@@ -7,6 +7,7 @@
 #include "crud_api_handler.h"
 #include "health_request_handler.h"
 #include "block_request_handler.h"
+#include "score_request_handler.h"
 #include "logger.h"
 
 // TODO:
@@ -29,6 +30,9 @@ RequestHandlerFactory* create_handler_factory(DispatcherEntry entry){
     }
     if (entry.handler_type == BLOCK_REQUEST_HANDLER){
         return new BlockRequestHandlerFactory(entry.location, entry.location_config);
+    }
+    if (entry.handler_type == SCORE_REQUEST_HANDLER){
+        return new ScoreRequestHandlerFactory(entry.location, entry.location_config);
     }
     return nullptr;
 }

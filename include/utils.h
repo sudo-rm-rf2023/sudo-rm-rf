@@ -26,7 +26,8 @@ enum HandlerType {
     NOTFOUND_HANDLER = 3,
     CRUD_API_HANDLER = 4,
     HEALTH_REQUEST_HANDLER = 5,
-    BLOCK_REQUEST_HANDLER = 6
+    BLOCK_REQUEST_HANDLER = 6,
+    SCORE_REQUEST_HANDLER = 7
 };
 
 struct RouterEntry { // Deprecated
@@ -51,5 +52,6 @@ namespace util {
 // Parse urls into string tokens
 // e.g /api/path//hello/world/ => ["api", "path", "hello", "world"]
 std::vector<std::string> parseURL(const std::string& url);
+
 } // namespace util
 #endif

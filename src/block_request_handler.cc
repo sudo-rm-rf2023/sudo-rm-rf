@@ -10,7 +10,7 @@ namespace http = boost::beast::http; // from <boost/beast/http.hpp>
 
 BlockRequestHandler::BlockRequestHandler(const std::string& location, const NginxConfig& config_block){
     std::optional<int> block_time = config_util::getBlockTimeFromLocationConfig(config_block);
-    block_time_ = *block_time;
+    block_time_ = block_time.value_or(2); // Default to 2 seconds.
     BOOST_LOG_TRIVIAL(info) << "Block time for location " << location << " set to " << std::to_string(block_time_);
 }
 

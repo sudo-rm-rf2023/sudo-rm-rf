@@ -58,6 +58,7 @@ add_library(boost_file_system_io_lib src/boost_file_system_io.cc)
 add_library(score_util_lib src/score_util.cc)
 add_library(test_file_system_io_lib src/test_file_system_io.cc)
 add_library(default_score_manager_lib src/default_score_manager.cc)
+add_library(score_request_handler_lib src/score_request_handler.cc)
 
 # Deprecated libraries
 add_library(config_manager_lib legacy/src/config_manager.cc)
@@ -71,7 +72,7 @@ target_link_libraries(router_lib echo_handler_lib static_handler_lib not_found_h
 target_link_libraries(config_utils_lib config_parser_lib utils_lib logger_lib)
 target_link_libraries(dispatcher_lib config_utils_lib utils_lib logger_lib static_handler_lib 
     echo_handler_lib not_found_handler_lib crud_api_handler_lib health_request_handler_lib 
-    block_request_handler_lib boost_file_system_io_lib)
+    block_request_handler_lib boost_file_system_io_lib score_request_handler_lib)
 target_link_libraries(logger_lib Boost::log Boost::log_setup Boost::system)
 target_link_libraries(config_parser_lib logger_lib)
 target_link_libraries(static_handler_lib logger_lib utils_lib config_utils_lib)
@@ -84,6 +85,7 @@ target_link_libraries(utils_lib config_parser_lib)
 target_link_libraries(boost_file_system_io_lib logger_lib)
 target_link_libraries(score_util_lib jsoncpp_lib logger_lib)
 target_link_libraries(default_score_manager_lib logger_lib score_util_lib jsoncpp)
+target_link_libraries(score_request_handler_lib logger_lib default_score_manager_lib utils_lib)
 
 # main
 add_executable(server src/server_main.cc)
