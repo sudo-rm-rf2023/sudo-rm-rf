@@ -20,6 +20,8 @@ steps:
   args: [
     'build',
     '-f', 'docker/Dockerfile',
+    # define SECRET_KEY here
+    '--build-arg', 'SECRET_KEY=secret-key',
     '-t', 'gcr.io/$PROJECT_ID/sudo-rm-rf:latest',
     '.'
   ]

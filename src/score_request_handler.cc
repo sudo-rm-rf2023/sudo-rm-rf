@@ -65,7 +65,7 @@ status ScoreRequestHandler::handle_request
             return true;
         }
 
-        std::optional<Score> new_score = score_util::ValidateAndGetJsonScoreObject(score_json);
+        std::optional<Score> new_score = score_util::ValidateAndGetJsonScoreObject(score_json, /*verify_hmac=*/true);
         if(!new_score.has_value()){
             // TODO: refactor repetitive code.
             BOOST_LOG_TRIVIAL(warning) << "Unable to convert Json to Score: Received invalid score in JSON format.";

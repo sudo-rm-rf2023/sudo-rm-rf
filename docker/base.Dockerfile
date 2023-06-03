@@ -19,4 +19,5 @@ RUN apt-get update && apt-get install -y \
     netcat \
     gcovr \
     bash \
+    libssl-dev \    
     libjsoncpp-dev

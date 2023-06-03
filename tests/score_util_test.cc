@@ -42,7 +42,7 @@ using ::testing::Field;
 using ::testing::AllOf;
 
 TEST_F(ScoreUtilTest, GetScoresFromJsonSimple){
-    json_string = "{\"scores\": [{\"username\": \"user1\", \"score\": 100}, {\"username\": \"user2\", \"score\": 200}] }";
+    json_string = "{\"scores\": [{\"username\": \"user1\", \"score\": 100, \"hash\": \"e163746f49c4625f298f95cd87a2f21b2e64c099e6a1108e2f5bdb1d604d135b\"}, {\"username\": \"user2\", \"score\": 200, \"hash\": \"78818b1b0b3fd1fbdb79710fafa4593fa16b49bfa5298ed6905d635f4e582980\"}] }";
     score_vector = score_util::GetScoresFromJson(json_string, "scores").value();
 
     EXPECT_THAT(score_vector,SizeIs(2));
@@ -59,5 +59,11 @@ TEST_F(ScoreUtilTest, GetScoresFromJsonEmpty){
     score_vector = score_util::GetScoresFromJson(json_string, "scores").value();
 
     EXPECT_THAT(score_vector,SizeIs(0));
+}
+
+// add a test for calculating the HMAC
+TEST_F(ScoreUtilTest, CalculateHMAC){
+    std::string hash = score_util::calculateHMAC("sudo-rm-rf-secret-key", "qianli51");
+    EXPECT_EQ(hash, "8822fd007ba03e5912183307e41575122b0aeb68d220567e201dd63e2598830f");
 }
 

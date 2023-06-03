@@ -30,6 +30,9 @@ add_subdirectory(/usr/src/googletest googletest)
 # Enable JsonCpp
 find_package(jsoncpp)
 
+# Enable OpenSSL
+find_package(OpenSSL REQUIRED)
+
 # Enable Boost
 # Use static libraries so binaries can be deployed without a full boost install
 set(Boost_USE_STATIC_LIBS ON)
@@ -83,7 +86,7 @@ target_link_libraries(health_request_handler_lib logger_lib)
 target_link_libraries(block_request_handler_lib logger_lib config_utils_lib)
 target_link_libraries(utils_lib config_parser_lib)
 target_link_libraries(boost_file_system_io_lib logger_lib)
-target_link_libraries(score_util_lib jsoncpp_lib logger_lib)
+target_link_libraries(score_util_lib jsoncpp_lib logger_lib OpenSSL::SSL OpenSSL::Crypto)
 target_link_libraries(default_score_manager_lib logger_lib score_util_lib jsoncpp)
 target_link_libraries(score_request_handler_lib logger_lib default_score_manager_lib utils_lib)
 

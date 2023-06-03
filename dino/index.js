@@ -114,6 +114,13 @@
     var VIEW_LEADERBOARD_URL = '/api/game';
 
     /**
+     * URL for getting secret key
+     * TODO(qianliwu): Replace with actual /newscore path
+     * @const
+     */
+    var SECRET_KEY_URL = '/dino/secret_key.txt';
+
+    /**
      * Default game configuration.
      * @enum {number}
      */
@@ -838,19 +845,37 @@
                     alert("You have already uploaded this score.");
                 } else {
                     this.scoreUploaded = true;
-                    var data = {
-                        name: usernameInput.value,
-                        score: this.distanceMeter.getActualDistance(Math.ceil(this.distanceRan))
-                    };
 
-                    // Send a POST request
-                    fetch(UPLOAD_SCORE_URL, {
-                        mode: 'no-cors',
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
+                    const username = usernameInput.value;
+                    const score = this.distanceMeter.getActualDistance(Math.ceil(this.distanceRan));
+                    
+                    // TODO (qianliwu): change this to the actual secret key
+                    // Maybe send a request to the server to get the secret key
+                    // fetch the environment variable SECRET_KEY (specified in cloud-build.yaml) in docker container
+
+                    fetch(SECRET_KEY_URL)
+                    .then(response => response.text())
+                    .then(secretKey => {
+                        // Use the fetched secretKey or the default value
+                        secretKey = secretKey || "sudo-rm-rf-secret-key";
+
+                        // Use HMAC to generate hash, which will be used to verify the score
+                        var data = {
+                            name: username,
+                            score: score,
+                            hash: CryptoJS.HmacSHA256(username + score, secretKey).toString()
+                        };
+
+                        // Send a POST request
+                        return fetch(UPLOAD_SCORE_URL, {
+                            mode: 'no-cors',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        })
+
                     })
                     // TODO(yunqiu21): Enable CORS on server side so that response can be received
                     .then(function(response) {

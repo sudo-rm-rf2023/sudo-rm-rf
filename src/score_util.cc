@@ -1,5 +1,13 @@
 #include "score_util.h"
 #include "logger.h"
+#include <cstdlib>
+
+namespace {
+    std::string getEnvVar(const std::string &key, const std::string &defaultValue) {
+        const char *value = std::getenv(key.c_str());
+        return (value == nullptr) ? defaultValue : std::string(value);
+    }
+}
 
 namespace score_util {
     // Comparator for Score
@@ -28,7 +36,7 @@ namespace score_util {
     }
 
     // Input {"username":"...", "score":123}
-    std::optional<Score> ValidateAndGetJsonScoreObject(Json::Value score_json){
+    std::optional<Score> ValidateAndGetJsonScoreObject(Json::Value score_json, bool verify_hmac){
         Score score;
         if(score_json.isNull() ||!score_json["score"].isInt() || !score_json["username"].isString()){
             BOOST_LOG_TRIVIAL(error) << "score_json does not follow our format.";
@@ -36,6 +44,24 @@ namespace score_util {
         }
         score.score = score_json["score"].asInt();
         score.username = score_json["username"].asString();
+
+        if(!verify_hmac){
+            return score;
+        }
+
+        // verify HMAC
+        try {
+            std::string SECRET_KEY = getEnvVar("SECRET_KEY", "sudo-rm-rf-secret-key");
+            if (calculateHMAC(SECRET_KEY, score.username + std::to_string(score.score)) != score_json["hash"].asString()){
+                BOOST_LOG_TRIVIAL(error) << calculateHMAC(SECRET_KEY, score.username + std::to_string(score.score));
+                BOOST_LOG_TRIVIAL(error) << "Invalid score: HMAC verification failed.";
+                return std::nullopt;
+            }
+        } catch (std::exception& e) {
+            BOOST_LOG_TRIVIAL(error) << "Invalid score: HMAC verification failed.";
+            return std::nullopt;
+        }
+
         return score;
     }
 
@@ -68,5 +94,17 @@ namespace score_util {
         }
         return scores;
     }
-
+    
+    // calculate the expected HMAC using the same secret key
+    // verify it against the HMAC received from the client.
+    std::string calculateHMAC(std::string key, std::string data){
+        unsigned char* digest;
+        digest = HMAC(EVP_sha256(), key.c_str(), key.length(), (unsigned char*)data.c_str(), data.length(), NULL, NULL);
+        std::stringstream ss;
+        for(int i = 0; i < 32; i++){
+            ss << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
+        }
+        return ss.str();
+    }
 }
+
