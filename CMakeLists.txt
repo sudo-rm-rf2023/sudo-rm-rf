@@ -56,6 +56,8 @@ add_library(config_utils_lib src/config_utils.cc)
 add_library(dispatcher_lib src/dispatcher.cc)
 add_library(boost_file_system_io_lib src/boost_file_system_io.cc)
 add_library(score_util_lib src/score_util.cc)
+add_library(test_file_system_io_lib src/test_file_system_io.cc)
+add_library(default_score_manager_lib src/default_score_manager.cc)
 
 # Deprecated libraries
 add_library(config_manager_lib legacy/src/config_manager.cc)
@@ -81,6 +83,7 @@ target_link_libraries(block_request_handler_lib logger_lib config_utils_lib)
 target_link_libraries(utils_lib config_parser_lib)
 target_link_libraries(boost_file_system_io_lib logger_lib)
 target_link_libraries(score_util_lib jsoncpp_lib logger_lib)
+target_link_libraries(default_score_manager_lib logger_lib score_util_lib jsoncpp)
 
 # main
 add_executable(server src/server_main.cc)
@@ -132,7 +135,7 @@ gtest_discover_tests(not_found_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SO
 
 # crud_api_handler test
 add_executable(crud_api_handler_test tests/crud_api_handler_test.cc)
-target_link_libraries(crud_api_handler_test crud_api_handler_lib gtest_main)
+target_link_libraries(crud_api_handler_test crud_api_handler_lib gtest_main test_file_system_io_lib)
 gtest_discover_tests(crud_api_handler_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # health_request_handler test
@@ -175,14 +178,19 @@ add_executable(score_util_test tests/score_util_test.cc)
 target_link_libraries(score_util_test score_util_lib gtest_main)
 gtest_discover_tests(score_util_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# default_score_manager test
+add_executable(default_score_manager_test tests/default_score_manager_test.cc)
+target_link_libraries(default_score_manager_test default_score_manager_lib gtest_main test_file_system_io_lib)
+gtest_discover_tests(default_score_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
 # Coverage target/test targets
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
     TARGETS 
         server server_lib session_lib config_manager_lib config_parser_lib echo_handler_lib health_request_handler_lib block_request_handler_lib
         static_handler_lib not_found_handler_lib crud_api_handler_lib router_lib config_utils_lib dispatcher_lib boost_file_system_io_lib utils_lib
-        score_util_lib
+        score_util_lib default_score_manager_lib
     TESTS 
         config_parser_test config_manager_test server_test session_test echo_request_handler_test health_request_handler_test block_request_handler_test
         static_request_handler_test not_found_handler_test crud_api_handler_test router_test config_utils_test dispatcher_test boost_file_system_io_test
-        utils_test score_util_test)
+        utils_test score_util_test default_score_manager_test)

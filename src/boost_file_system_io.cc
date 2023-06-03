@@ -4,9 +4,7 @@
 std::optional<std::ostringstream> BoostFileSystemIO::read_file(
     std::string file_path) {
   fs::path boost_file_path(file_path);
-  if (!fs::exists(boost_file_path) || !fs::is_regular_file(boost_file_path)) {
-    BOOST_LOG_TRIVIAL(debug) << "Cannot open file: " << file_path
-                             << ". Does not exist or non-regular";
+  if (!exists(file_path)) {
     return std::nullopt;
   }
 
@@ -82,4 +80,15 @@ std::optional<std::vector<std::string>> BoostFileSystemIO::ls(
   }
 
   return file_names;
+}
+
+bool BoostFileSystemIO::exists(std::string file_path)
+{
+  fs::path boost_file_path(file_path);
+  if (!fs::exists(boost_file_path) || !fs::is_regular_file(boost_file_path)) {
+    BOOST_LOG_TRIVIAL(debug) << "Invalid file: " << file_path
+                             << ". Does not exist or non-regular";
+    return false;
+  }
+  return true;
 }

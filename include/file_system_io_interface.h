@@ -14,6 +14,7 @@ class FileSystemIOInterface {
                           const std::ostringstream &bytes) = 0;
   virtual bool delete_file(std::string file_path) = 0;
   virtual std::optional<std::vector<std::string>> ls(std::string dir_name) = 0;
+  virtual bool exists(std::string file_path) = 0;
 };
 
 #endif

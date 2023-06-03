@@ -4,7 +4,7 @@
 namespace score_util {
     // Comparator for Score
     bool CompareScore(const Score &a, const Score &b){
-        return a.score < b.score;
+        return a.score >= b.score;
     }
 
     // Converts a Score to a Json document

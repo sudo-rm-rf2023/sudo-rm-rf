@@ -23,6 +23,8 @@ class BoostFileSystemIO : public FileSystemIOInterface {
 
   std::optional<std::vector<std::string>> ls(std::string dir_name) override;
 
+  bool exists(std::string file_path) override;
+
 };
 
 #endif
