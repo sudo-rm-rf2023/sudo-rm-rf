@@ -104,14 +104,14 @@
      * TODO(yunqiu21): Replace with actual /newscore path
      * @const
      */
-    var UPLOAD_SCORE_URL = '/api/game';
+    var UPLOAD_SCORE_URL = '/score/newscore';
 
     /**
      * URL for viewing leaderboard
      * TODO(yunqiu21): Replace with actual /leaderboard path
      * @const
      */
-    var VIEW_LEADERBOARD_URL = '/api/game';
+    var VIEW_LEADERBOARD_URL = '/score/scoreboard';
 
     /**
      * URL for getting secret key
@@ -857,11 +857,11 @@
                     .then(response => response.text())
                     .then(secretKey => {
                         // Use the fetched secretKey or the default value
-                        secretKey = secretKey || "sudo-rm-rf-secret-key";
+                        secretKey = secretKey.trim() || "sudo-rm-rf-secret-key";
 
                         // Use HMAC to generate hash, which will be used to verify the score
                         var data = {
-                            name: username,
+                            username: username,
                             score: score,
                             hash: CryptoJS.HmacSHA256(username + score, secretKey).toString()
                         };
