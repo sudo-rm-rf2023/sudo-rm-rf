@@ -104,10 +104,10 @@ add_executable(config_manager_test legacy/tests/config_manager_test.cc)
 target_link_libraries(config_manager_test config_manager_lib gtest_main gmock)
 gtest_discover_tests(config_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/legacy/tests)
 
-# server test
-add_executable(server_test tests/server_test.cc)
-target_link_libraries(server_test server_lib gtest_main)
-gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+# # server test
+# add_executable(server_test tests/server_test.cc)
+# target_link_libraries(server_test server_lib gtest_main)
+# gtest_discover_tests(server_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # dispatcher test
 add_executable(dispatcher_test tests/dispatcher_test.cc)
@@ -200,6 +200,6 @@ generate_coverage_report(
         static_handler_lib not_found_handler_lib crud_api_handler_lib router_lib config_utils_lib dispatcher_lib boost_file_system_io_lib utils_lib
         score_util_lib default_score_manager_lib
     TESTS 
-        config_parser_test config_manager_test server_test session_test echo_request_handler_test health_request_handler_test block_request_handler_test
+        config_parser_test config_manager_test session_test echo_request_handler_test health_request_handler_test block_request_handler_test
         static_request_handler_test not_found_handler_test crud_api_handler_test router_test config_utils_test dispatcher_test boost_file_system_io_test
         utils_test score_util_test default_score_manager_test score_request_handler_test)

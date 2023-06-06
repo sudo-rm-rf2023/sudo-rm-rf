@@ -42,6 +42,22 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
+        // Fetch the certificate and key paths from the config
+        std::optional<std::string> cert_path = config_util::getCertPathFromConfig(config);
+        std::optional<std::string> key_path = config_util::getPrivateKeyPathFromConfig(config);
+
+        if (!cert_path || !key_path) {
+            BOOST_LOG_TRIVIAL(error) << "SSL certificate or private key not configured";
+            return 1;
+        }
+
+        // Create the SSL context
+        boost::asio::ssl::context ssl_context{boost::asio::ssl::context::tlsv12};
+
+        // Load the certificate and private key
+        ssl_context.use_certificate_chain_file(cert_path.value());
+        ssl_context.use_private_key_file(key_path.value(), boost::asio::ssl::context::pem);
+
         unsigned int num_threads = config_util::getNumThreadsFromConfig(config).value_or(1); // Default to single threaded server if not set
 
         std::unordered_map<std::string, RequestHandlerFactory*> routes;
@@ -51,7 +67,7 @@ int main(int argc, char *argv[]) {
         }
         Dispatcher* dispatcher = new Dispatcher(routes);
 
-        server s(io_service, port.value(), dispatcher, num_threads);
+        server s(io_service, ssl_context, port.value(), dispatcher, num_threads);
         s.run();
     } catch (std::exception &e) {
         BOOST_LOG_TRIVIAL(error) << "Exception: " << e.what();

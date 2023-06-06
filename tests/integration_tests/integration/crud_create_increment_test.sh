@@ -9,9 +9,9 @@ DATA="{'some': 'json_fields'}"
 CRUD_API_PATH="api/Socks"
 
 # Create entitity 1
-curl -X "${METHOD}" -H "Content-Type: text/plain" -H "User-Agent:" -d "${DATA}" -i -s -S http://localhost:${TEST_PORT}/${CRUD_API_PATH} > /dev/null
+curl -k -X "${METHOD}" -H "Content-Type: text/plain" -H "User-Agent:" -d "${DATA}" -i -s -S https://localhost:${TEST_PORT}/${CRUD_API_PATH} > /dev/null
 # Send a request to the web server and capture the output
-curl -o "${SCRIPT_DIR}/$ACTUAL_RESPONSE_FILE" -X "${METHOD}" -H "Content-Type: text/plain" -H "User-Agent:" -d "${DATA}" -i -s -S http://localhost:${TEST_PORT}/${CRUD_API_PATH}
+curl -k -o "${SCRIPT_DIR}/$ACTUAL_RESPONSE_FILE" -X "${METHOD}" -H "Content-Type: text/plain" -H "User-Agent:" -d "${DATA}" -i -s -S https://localhost:${TEST_PORT}/${CRUD_API_PATH}
 
 # Verify that the response from the web server is as expected
 # -b option ignores line endings (Windows vs. Linux)

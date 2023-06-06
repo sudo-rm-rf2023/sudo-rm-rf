@@ -12,12 +12,23 @@
 
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
-tcp::socket& session::socket() {
+boost::asio::ssl::stream<tcp::socket>& session::socket() {
     return socket_;
 }
 
 void session::start() {
-  read_request();
+  // Perform the SSL handshake
+  socket_.async_handshake(boost::asio::ssl::stream_base::server,
+    strand_.wrap(
+      [this](boost::beast::error_code ec){
+        if(!ec){
+          read_request();
+        } else {
+          BOOST_LOG_TRIVIAL(error) << "Error in async_handshake (I/O): " << ec.message();
+          delete this;
+          return;
+        }
+      }));
 }
 
 // read request by http::async_read
@@ -25,7 +36,7 @@ void session::read_request() {
   http::async_read(socket_, buffer_, request_, strand_.wrap(
     [this](boost::beast::error_code ec, std::size_t bytes_transferred){
       if(!ec){
-        BOOST_LOG_TRIVIAL(info) << REQUEST_IP << socket_.remote_endpoint().address().to_string() << ":" << socket_.remote_endpoint().port();
+        BOOST_LOG_TRIVIAL(info) << REQUEST_IP << socket_.lowest_layer().remote_endpoint().address().to_string() << ":" << socket_.lowest_layer().remote_endpoint().port();
         // generate error message if failed to generate response
         if(!dispatcher_->assign_request(request_, response_)){
           BOOST_LOG_TRIVIAL(error) << "Failed to generate response.";

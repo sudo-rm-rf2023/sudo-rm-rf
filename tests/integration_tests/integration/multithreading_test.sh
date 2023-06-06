@@ -6,14 +6,14 @@ EXPECTED_RESPONSE_FILE="${SCRIPT_DIR}/../test_static_root/test_index.html"
 ACTUAL_RESPONSE_FILE="${SCRIPT_DIR}/actual_multithreading_static_html_response.html"
 
 # Send a sleep request to the web server
-http GET localhost:8080/block > /dev/null &
+curl -k https://localhost:8080/block > /dev/null &
 BLOCK_PID=$!
 
 # wait for the request to start
-sleep 2
+sleep 2q
 
 # Send a request to the web server to get the static file and save the output to ACTUAL_RESPONSE_FILE
-curl -o "$ACTUAL_RESPONSE_FILE" -s -S http://localhost:$TEST_PORT/static/test_index.html -H "User-Agent:"
+curl -k -o "$ACTUAL_RESPONSE_FILE" -s -S https://localhost:$TEST_PORT/static/test_index.html -H "User-Agent:"
 
 # Compare the received file (ACTUAL_RESPONSE_FILE) with the expected file (EXPECTED_RESPONSE_FILE)
 # -b option ignores line endings (Windows vs. Linux)

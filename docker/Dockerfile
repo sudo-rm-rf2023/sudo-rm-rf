@@ -40,7 +40,7 @@ ENV SECRET_KEY=${SECRET_KEY}
 # Copy server output binary to "."
 COPY --from=builder /usr/src/projects/sudo-rm-rf/build/bin/server .
 COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/localrun.conf .
-COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/assign9.conf .
+COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/assignssl.conf .
 
 # Copy all necessary files from the obfuscator stage
 COPY --from=obfuscator /app/dino ./dino
@@ -63,4 +63,4 @@ ENTRYPOINT ["./server"]
 
 # Use CMD to specify arguments to ENTRYPOINT
 # Update with real server args
-CMD ["assign9.conf"]
+CMD ["assignssl.conf"]

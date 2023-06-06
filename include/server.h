@@ -18,7 +18,7 @@ using boost::asio::ip::tcp;
 
 class server {
 public:
-  server(boost::asio::io_service& io_service, int port, Dispatcher* dispatcher, unsigned int num_threads);
+  server(boost::asio::io_service& io_service, boost::asio::ssl::context& ssl_context, int port, Dispatcher* dispatcher, unsigned int num_threads);
 
   void run();
 private:
@@ -35,6 +35,7 @@ private:
   int port_;
 
   boost::asio::io_service& io_service_;
+  boost::asio::ssl::context& ssl_context_;
   tcp::acceptor acceptor_;
   std::unique_ptr<Dispatcher> dispatcher_;
 

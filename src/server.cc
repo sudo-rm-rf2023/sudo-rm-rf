@@ -12,8 +12,9 @@
 #include "logger.h"
 #include "config_utils.h"
 
-server::server(boost::asio::io_service &io_service, int port, Dispatcher* dispatcher, unsigned int num_threads) 
+server::server(boost::asio::io_service &io_service, boost::asio::ssl::context& ssl_context, int port, Dispatcher* dispatcher, unsigned int num_threads) 
     : io_service_(io_service),
+      ssl_context_(ssl_context),
       dispatcher_(std::unique_ptr<Dispatcher>(dispatcher)),
       acceptor_(boost::asio::ip::tcp::acceptor(io_service, tcp::endpoint(tcp::v4(), port))),
       num_threads_(num_threads),
@@ -40,8 +41,8 @@ void server::run(){
 }
 
 void server::start_accept() {
-    session *new_session = session::makeSession(io_service_, dispatcher_.get());
-    acceptor_.async_accept(new_session->socket(),
+    session *new_session = session::makeSession(io_service_, ssl_context_, dispatcher_.get());
+    acceptor_.async_accept(new_session->socket().lowest_layer(),
                            boost::bind(&server::handle_accept, this, new_session,
                                        boost::asio::placeholders::error));
 }
