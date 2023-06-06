@@ -123,6 +123,14 @@ TEST_F(ConfigUtilsTest, GetDispatcherEntriesInvalid){
     EXPECT_FALSE(config_util::validateConfig(config));
 }
 
+TEST_F(ConfigUtilsTest, GetCertificatePath){
+    ASSERT_TRUE(ParseFile("./test_configs/new_configs/valid_certificate.conf"));
+    EXPECT_EQ(config_util::getCertPathFromConfig(config).value(), "./cert.pem");
+}
 
+TEST_F(ConfigUtilsTest, GetPrivateKeyPath){
+    ASSERT_TRUE(ParseFile("./test_configs/new_configs/valid_certificate.conf"));
+    EXPECT_EQ(config_util::getPrivateKeyPathFromConfig(config).value(), "./key.pem");
+}
 
 

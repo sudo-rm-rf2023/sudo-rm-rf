@@ -26,6 +26,9 @@ std::optional<std::string> getDataPathFromLocationConfig(const NginxConfig &loca
 
 std::optional<int> getBlockTimeFromLocationConfig(const NginxConfig &location_config);
 
+std::optional<std::string> getCertPathFromConfig(const NginxConfig &config);
+std::optional<std::string> getPrivateKeyPathFromConfig(const NginxConfig &config);
+
 } // namespace config_util
 
 #endif

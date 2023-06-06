@@ -4,4 +4,5 @@ build
 build_*
 mirror
 tests/**/actual*
-**/log
+**/*.pem
+**/log/**

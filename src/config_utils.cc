@@ -220,4 +220,26 @@ bool validateConfig(const NginxConfig &config){
     return true;
 }
 
+std::optional<std::string> getCertPathFromConfig(const NginxConfig &config) {
+    for (std::shared_ptr<NginxConfigStatement> statement : config.statements_) {
+        std::optional<std::string> first_token = GetFirstTokenOfStatement(*statement);
+        if ((first_token == "ssl_certificate_path") && StatementHasNTokens(*statement, 2)) {
+            std::string cert_path_token = GetNthTokenOfStatement(*statement, 2).value();
+            return cert_path_token;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> getPrivateKeyPathFromConfig(const NginxConfig &config) {
+    for (std::shared_ptr<NginxConfigStatement> statement : config.statements_) {
+        std::optional<std::string> first_token = GetFirstTokenOfStatement(*statement);
+        if ((first_token == "ssl_private_key_path") && StatementHasNTokens(*statement, 2)) {
+            std::string key_path_token = GetNthTokenOfStatement(*statement, 2).value();
+            return key_path_token;
+        }
+    }
+    return std::nullopt;
+}
+
 } // namespace config_util
