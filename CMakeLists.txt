@@ -188,6 +188,10 @@ add_executable(default_score_manager_test tests/default_score_manager_test.cc)
 target_link_libraries(default_score_manager_test default_score_manager_lib gtest_main test_file_system_io_lib)
 gtest_discover_tests(default_score_manager_test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# score_request_handler test
+add_executable(score_request_handler_test tests/score_request_handler_test.cc)
+target_link_libraries(score_request_handler_test score_request_handler_lib gtest_main gmock jsoncpp_lib score_util_lib config_utils_lib boost_file_system_io_lib)
+
 # Coverage target/test targets
 include(cmake/CodeCoverageReportConfig.cmake)
 generate_coverage_report(
@@ -198,4 +202,4 @@ generate_coverage_report(
     TESTS 
         config_parser_test config_manager_test server_test session_test echo_request_handler_test health_request_handler_test block_request_handler_test
         static_request_handler_test not_found_handler_test crud_api_handler_test router_test config_utils_test dispatcher_test boost_file_system_io_test
-        utils_test score_util_test default_score_manager_test)
+        utils_test score_util_test default_score_manager_test score_request_handler_test)

@@ -12,14 +12,16 @@ namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 class ScoreRequestHandler : public RequestHandler{
 public:
     ScoreRequestHandler(const std::string &location, const NginxConfig &config_block,
-                        std::shared_ptr<ScoreManager> score_manager)
-                            : score_manager_(score_manager), request_path_(location){}
+                        std::shared_ptr<ScoreManager> score_manager, bool verify_hmac)
+                            : score_manager_(score_manager), request_path_(location),
+                              verify_hmac_(verify_hmac){}
 
     status handle_request(const http::request<http::string_body> &request,
                         http::response<http::string_body> &response) override;
 private:
     std::shared_ptr<ScoreManager> score_manager_;
     const std::string request_path_;
+    const bool verify_hmac_;
 };
 
 class ScoreRequestHandlerFactory : public RequestHandlerFactory {

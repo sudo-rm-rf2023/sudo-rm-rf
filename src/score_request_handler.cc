@@ -25,7 +25,7 @@ ScoreRequestHandlerFactory::ScoreRequestHandlerFactory
 }
 
 std::shared_ptr<RequestHandler> ScoreRequestHandlerFactory::create(){
-    return std::make_shared<ScoreRequestHandler>(location_, config_block_, score_manager_);
+    return std::make_shared<ScoreRequestHandler>(location_, config_block_, score_manager_,  /*verify_hmac=*/true);
 }
 
 status ScoreRequestHandler::handle_request
@@ -65,7 +65,7 @@ status ScoreRequestHandler::handle_request
             return true;
         }
 
-        std::optional<Score> new_score = score_util::ValidateAndGetJsonScoreObject(score_json, /*verify_hmac=*/true);
+        std::optional<Score> new_score = score_util::ValidateAndGetJsonScoreObject(score_json, verify_hmac_);
         if(!new_score.has_value()){
             // TODO: refactor repetitive code.
             BOOST_LOG_TRIVIAL(warning) << "Unable to convert Json to Score: Received invalid score in JSON format.";
