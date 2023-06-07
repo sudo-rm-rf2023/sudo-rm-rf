@@ -109,7 +109,7 @@
      * URL for viewing leaderboard
      * @const
      */
-    var VIEW_LEADERBOARD_URL = '/score/scoreboard';
+    var VIEW_LEADERBOARD_URL = '/leaderboard';
 
     /**
      * URL for getting secret key
@@ -828,7 +828,8 @@
             // Create username input field
             var usernameInput = document.createElement("input");
             usernameInput.type = "text";
-            usernameInput.placeholder = "Enter a username";
+            usernameInput.placeholder = "Enter username (max 24 char)";
+            usernameInput.maxLength = 24;
             usernameInput.className = Runner.classes.GAMEOVER;
 
             // Create upload score button
@@ -836,7 +837,7 @@
             uploadScoreButton.textContent = "Upload Score";
             uploadScoreButton.className = Runner.classes.GAMEOVER;
             uploadScoreButton.onclick = () => {
-                if (!usernameInput.value) {
+                if (!usernameInput.value || usernameInput.value.trim() === "") {
                     alert("Must enter a username!");
                 } else if (this.scoreUploaded) {
                     alert("You have already uploaded this score.");

@@ -11,11 +11,12 @@ function displayLeaderboard(data) {
   // Display the leaderboard
   const leaderboardContainer = document.getElementById("leaderboard");
   let leaderboardHTML =
-    "<table><thead><tr><th>Username</th><th>Score</th></tr></thead><tbody>";
+    "<table><thead><tr><th>Ranking</th><th>Username</th><th>Score</th></tr></thead><tbody>";
 
   for (let i = 0; i < data.ranking.length; i++) {
     leaderboardHTML += `
       <tr>
+        <td>${i + 1}</td>
         <td>${data.ranking[i].username}</td>
         <td>${data.ranking[i].score}</td>
       </tr>`;
