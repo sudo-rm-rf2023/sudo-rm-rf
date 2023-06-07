@@ -109,7 +109,7 @@
      * URL for viewing leaderboard
      * @const
      */
-    var VIEW_LEADERBOARD_URL = '/leaderboard';
+    var VIEW_LEADERBOARD_URL = '/leaderboard/';
 
     /**
      * URL for getting secret key
