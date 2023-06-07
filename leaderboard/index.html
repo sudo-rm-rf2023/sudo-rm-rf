@@ -1,46 +1,73 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Leaderboard</title>
-    <style>
-      h1 {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        font-size: 40px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: Arial, sans-serif;
-        font-size: 30px;
-      }
 
-      thead th {
-        background-color: #f2f2f2;
-        border-bottom: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
+<head>
+  <title>Leaderboard</title>
+  <style>
+    h1 {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      font-size: 40px;
+    }
 
-      tbody tr:nth-child(even) {
-        background-color: #f9f9f9;
-      }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      font-size: 30px;
+    }
 
-      tbody td {
-        border-bottom: 1px solid #ddd;
-        padding: 8px;
-      }
+    thead th {
+      background-color: #f2f2f2;
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
 
-      #leaderboard {
-        max-width: 500px;
-        margin: 0 auto;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Leaderboard</h1>
-    <div id="leaderboard"></div>
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
 
-    <script src="index.js"></script>
-  </body>
+    tbody td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    #leaderboard {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    button {
+      display: block;
+      width: 200px;
+      height: 50px;
+      margin: 20px auto;
+      background-color: #4CAF50;
+      /* for example, green */
+      color: white;
+      font-size: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Leaderboard</h1>
+  <div id="leaderboard"></div>
+
+  <script src="index.js"></script>
+  <!-- Return to Dino page -->
+  <a href="../dino/index.html">
+    <button>Return to Dino page</button>
+  </a>
+</body>
+
 </html>
