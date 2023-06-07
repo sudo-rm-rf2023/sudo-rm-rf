@@ -101,21 +101,18 @@
 
     /**
      * URL for uploading score
-     * TODO(yunqiu21): Replace with actual /newscore path
      * @const
      */
     var UPLOAD_SCORE_URL = '/score/newscore';
 
     /**
      * URL for viewing leaderboard
-     * TODO(yunqiu21): Replace with actual /leaderboard path
      * @const
      */
     var VIEW_LEADERBOARD_URL = '/score/scoreboard';
 
     /**
      * URL for getting secret key
-     * TODO(qianliwu): Replace with actual /newscore path
      * @const
      */
     var SECRET_KEY_URL = '/dino/secret_key.txt';
@@ -804,8 +801,8 @@
             this.playSound(this.soundFx.HIT);
             vibrate(200);
 
-            this.stop();
             this.stopListening();
+            this.stop();
             this.crashed = true;
             this.distanceMeter.acheivement = false;
 
@@ -877,24 +874,15 @@
                         })
 
                     })
-                    // TODO(yunqiu21): Enable CORS on server side so that response can be received
                     .then(function(response) {
-                        // Request was made, but response data is restricted
-                        console.log('Request made, but response is restricted');
+                        if (response.ok) {
+                            // Request was successful
+                            alert("Success!");
+                        } else {
+                            // Request failed
+                            throw new Error('Request failed. Status:', response.status);
+                        }
                     })
-                    // TODO(yunqiu21): Uncomment this to check response
-                    // .then(function(response) {
-                    //     if (response.ok) {
-                    //         // Request was successful
-                    //         return response.text();
-                    //     } else {
-                    //         // Request failed
-                    //         throw new Error('Request failed. Status:', response.status);
-                    //     }
-                    // })
-                    // .then(function(data) {
-                    //     console.log(data);
-                    // })
                     .catch(function(error) {
                         console.error('Request error:', error);
                     });
