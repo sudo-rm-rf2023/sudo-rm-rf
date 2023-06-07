@@ -44,6 +44,7 @@ COPY --from=builder /usr/src/projects/sudo-rm-rf/server_configs/assign9.conf .
 
 # Copy all necessary files from the obfuscator stage
 COPY --from=obfuscator /app/dino ./dino
+COPY --from=builder /usr/src/projects/sudo-rm-rf/leaderboard ./leaderboard
 
 # Copy static files
 COPY --from=builder /usr/src/projects/sudo-rm-rf/static ./static
